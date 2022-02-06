@@ -1,0 +1,15 @@
+main: de.timesnake.game.endgame.main.GameEndGame
+version: 1.0
+name: game-endgame
+author: Mn
+depend: [ basic-bukkit ]
+api-version: 1.13
+
+commands:
+  endgame:
+  eg:
+  loc:
+  location:
+  pos:
+  position:
+  locshow:
