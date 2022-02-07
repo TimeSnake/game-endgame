@@ -10,8 +10,8 @@ import de.timesnake.database.util.object.TooLongEntryException;
 import de.timesnake.game.endgame.server.EndGameMode;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.game.endgame.server.EndGameServerManager;
-import de.timesnake.library.basic.util.cmd.Arguments;
-import de.timesnake.library.basic.util.cmd.ExCommand;
+import de.timesnake.library.extension.util.cmd.Arguments;
+import de.timesnake.library.extension.util.cmd.ExCommand;
 
 import java.util.List;
 
