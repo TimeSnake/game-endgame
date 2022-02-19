@@ -10,12 +10,13 @@ import de.timesnake.basic.bukkit.util.user.event.UserJoinEvent;
 import de.timesnake.basic.bukkit.util.user.scoreboard.Tablist;
 import de.timesnake.basic.bukkit.util.user.scoreboard.TablistGroupType;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
-import de.timesnake.channel.api.message.ChannelServerMessage;
+import de.timesnake.channel.util.message.ChannelServerMessage;
+import de.timesnake.channel.util.message.MessageType;
 import de.timesnake.database.util.Database;
-import de.timesnake.database.util.object.Status;
 import de.timesnake.database.util.object.Type;
 import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
+import de.timesnake.library.basic.util.Status;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -164,7 +165,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
                     e.printStackTrace();
                 }
             }
-            this.getChannel().sendMessageToProxy(ChannelServerMessage.getRestartMessage(this.getPort(), 40));
+            this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getPort(), MessageType.Server.RESTART, 40));
             Bukkit.shutdown();
         }, 5 * 20, GameEndGame.getPlugin());
     }
