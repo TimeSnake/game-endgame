@@ -5,12 +5,12 @@ import de.timesnake.basic.bukkit.util.chat.Argument;
 import de.timesnake.basic.bukkit.util.chat.ChatColor;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
+import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Instrument;
-import org.bukkit.Location;
 import org.bukkit.Note;
 
 import java.util.List;
@@ -32,13 +32,13 @@ public class LocCmd implements CommandListener {
             return;
         }
 
-        Location loc = sender.getPlayer().getLocation();
+        ExLocation loc = sender.getUser().getExLocation();
         String name = args.toMessage();
 
         Server.broadcastClickableMessage(Server.getChat().getSenderMember(sender.getUser()) + ChatColor.PUBLIC + name + " " + ChatColor.VALUE + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), "/locshow " + name, "Click to save the location in the sideboard", ClickEvent.Action.RUN_COMMAND);
         Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
 
-        EndGameServer.addLocation(name, loc.getBlock().getLocation());
+        EndGameServer.getLocShowManager().addLocation(name, loc.getExBlock().getLocation());
     }
 
     @Override

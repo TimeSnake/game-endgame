@@ -1,9 +1,8 @@
 package de.timesnake.game.endgame.server;
 
 import de.timesnake.basic.bukkit.util.Server;
-import org.bukkit.Location;
+import de.timesnake.game.endgame.player.LocShowManager;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 public class EndGameServer extends Server {
@@ -42,19 +41,15 @@ public class EndGameServer extends Server {
         server.setTimeRunning(run);
     }
 
-    public static void addLocation(String name, Location location) {
-        server.addLocation(name, location);
-    }
-
-    public static HashMap<String, Location> getLocationsByName() {
-        return server.getLocationsByName();
-    }
-
     public static boolean isReset() {
         return server.isReset();
     }
 
     public static void setMode(EndGameMode mode) {
         server.setMode(mode);
+    }
+
+    public static LocShowManager getLocShowManager() {
+        return server.getLocShowManager();
     }
 }

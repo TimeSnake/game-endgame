@@ -4,11 +4,10 @@ import de.timesnake.basic.bukkit.util.chat.Argument;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
-import de.timesnake.basic.bukkit.util.user.scoreboard.Sideboard;
+import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
-import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,27 +32,20 @@ public class LocShowCmd implements CommandListener {
             return;
         }
 
-        HashMap<String, Location> locationsByName = EndGameServer.getLocationsByName();
+        HashMap<String, ExLocation> locationsByName = EndGameServer.getLocShowManager().getLocationsByName();
         String name = args.toMessage();
         if (locationsByName.get(name) == null) {
             sender.sendMessageNotExist(name, 2503, "location");
             return;
         }
 
-        Location loc = locationsByName.get(name);
+        ExLocation loc = locationsByName.get(name);
 
         if (name.length() >= 13) {
             name = name.substring(0, 13);
         }
 
-        Sideboard sideboard = EndGameServer.getScoreboardManager().registerNewSideboard("endgameloc", "§6§lLocation");
-        sideboard.setScore(4, "§cName: §f" + name);
-        sideboard.setScore(3, "-------------------");
-        sideboard.setScore(2, "§9X: §f" + loc.getBlockX());
-        sideboard.setScore(1, "§9Y: §f" + loc.getBlockY());
-        sideboard.setScore(0, "§9Z: §f" + loc.getBlockZ());
-
-        user.setSideboard(sideboard);
+        EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc);
     }
 
     @Override

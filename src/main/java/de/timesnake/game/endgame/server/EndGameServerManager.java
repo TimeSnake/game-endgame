@@ -16,8 +16,12 @@ import de.timesnake.database.util.Database;
 import de.timesnake.database.util.object.Type;
 import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
+import de.timesnake.game.endgame.player.LocShowManager;
 import de.timesnake.library.basic.util.Status;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,7 +32,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -61,7 +64,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
     private File tagFile;
 
-    private final HashMap<String, Location> locationsByName = new HashMap<>();
+    private LocShowManager locShowManager;
 
     public void onEndGameEnable() {
         owner = Database.getEndGame().getUserFromServer(Database.getServers().getServer(Type.Server.GAME, Server.getPort()));
@@ -88,6 +91,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
         if (this.tagFile.exists()) {
             this.tagFile.delete();
         }
+
+        this.locShowManager = new LocShowManager();
 
         LinkedList<TablistGroupType> types = new LinkedList<>();
         types.add(Group.getTablistType());
@@ -124,7 +129,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
         if (this.timeTask != null) {
             this.timeTask.cancel();
         }
-        this.locationsByName.clear();
+
+        this.locShowManager.reset();
         Server.broadcastMessage(Plugin.END_GAME, ChatColor.WARNING + "Starting world reset");
         for (User user : Server.getUsers()) {
             user.resetSideboard();
@@ -245,13 +251,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
         this.gameTablist.setFooter("§6Time: §9" + ts);
     }
 
-    public void addLocation(String name, Location loc) {
-        this.locationsByName.put(name, loc);
-    }
 
-    public HashMap<String, Location> getLocationsByName() {
-        return locationsByName;
-    }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
@@ -316,5 +316,9 @@ public class EndGameServerManager extends ServerManager implements Listener {
         this.gameWorld.setGameRule(GameRule.NATURAL_REGENERATION, !mode.isHardcore());
         this.gameWorldNether.setGameRule(GameRule.NATURAL_REGENERATION, !mode.isHardcore());
         this.gameWorldEnd.setGameRule(GameRule.NATURAL_REGENERATION, !mode.isHardcore());
+    }
+
+    public LocShowManager getLocShowManager() {
+        return locShowManager;
     }
 }
