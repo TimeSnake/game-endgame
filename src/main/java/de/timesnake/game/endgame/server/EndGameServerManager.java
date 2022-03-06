@@ -256,7 +256,6 @@ public class EndGameServerManager extends ServerManager implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         e.setDeathMessage("");
-
         User user = Server.getUser(e.getEntity());
         Server.broadcastMessage(Plugin.END_GAME, ChatColor.VALUE + user.getChatName() + ChatColor.WARNING + " died!");
         this.broadcastGameMessage(ChatColor.WARNING + "Game stopped");
