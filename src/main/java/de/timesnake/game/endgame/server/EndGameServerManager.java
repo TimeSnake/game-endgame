@@ -139,7 +139,6 @@ public class EndGameServerManager extends ServerManager implements Listener {
         this.reset = true;
         Server.runTaskLaterSynchrony(() -> {
             Server.setStatus(Status.Server.SERVICE);
-            Server.getWorldManager().resetUserLocations();
 
             this.gameWorld.setAutoSave(false);
             this.gameWorldNether.setAutoSave(false);
@@ -157,9 +156,9 @@ public class EndGameServerManager extends ServerManager implements Listener {
                 chunk.unload(false);
             }
 
-            Server.getWorldManager().unloadWorld(gameWorld);
-            Server.getWorldManager().unloadWorld(gameWorldNether);
-            Server.getWorldManager().unloadWorld(gameWorldEnd);
+            Server.getWorldManager().unloadWorld(gameWorld, false);
+            Server.getWorldManager().unloadWorld(gameWorldNether, false);
+            Server.getWorldManager().unloadWorld(gameWorldEnd, false);
 
             this.time = 0;
             this.updateTablistTime();
