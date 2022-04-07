@@ -102,7 +102,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
         Server.getScoreboardManager().setActiveTablist(this.gameTablist);
     }
 
-    public void onDisable() {
+    public void onEndGameDisable() {
         this.file.saveTime(this.time);
     }
 

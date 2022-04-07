@@ -40,7 +40,7 @@ public class GameEndGame extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        EndGameServerManager.getInstance().onDisable();
+        EndGameServerManager.getInstance().onEndGameDisable();
     }
 
     public static GameEndGame getPlugin() {

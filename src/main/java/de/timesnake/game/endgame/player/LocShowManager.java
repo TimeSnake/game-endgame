@@ -53,6 +53,14 @@ public class LocShowManager {
 
                 double angle = userAngle - locAngle;
 
+                while (angle > Math.PI) {
+                    angle = angle - 2 * Math.PI;
+                }
+
+                while (angle < -Math.PI) {
+                    angle = angle + 2 * Math.PI;
+                }
+
                 if (angle < -2.749 || angle >= 2.749) { // -7/8 pi
                     direction = "↓";
                 } else if (angle < -1.963) { // -5/8 pi
@@ -72,7 +80,9 @@ public class LocShowManager {
                 }
             }
 
-            sideboard.setScore(0, "§6§l     " + direction);
+            int heightDelta = location.getBlockY() - userLoc.getBlockY();
+
+            sideboard.setScore(0, "§6§l     " + direction + "    ↕ §6" + heightDelta + "m");
         }, 0, 20, GameEndGame.getPlugin());
 
         this.trackedLocationByUser.put(user, new Tuple<>(location, task));
