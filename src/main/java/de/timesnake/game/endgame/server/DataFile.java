@@ -9,7 +9,7 @@ public class DataFile extends ExFile {
     }
 
     public void saveTime(int time) {
-        super.set("time", time);
+        super.set("time", time).save();
     }
 
     public Integer getTime() {
