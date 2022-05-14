@@ -18,6 +18,7 @@ import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
 import de.timesnake.game.endgame.player.LocShowManager;
 import de.timesnake.library.basic.util.Status;
+import de.timesnake.library.extension.util.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -80,6 +81,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
         gameWorldEnd = Server.getWorldManager().createWorld("world_the_end");
 
         this.setMode(EndGameMode.EASY);
+        this.gameWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 
         file = new DataFile("endgame", "data");
         this.time = file.getTime();
@@ -89,6 +91,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
         this.tagFile = new File(Bukkit.getWorldContainer() + File.separator + "eg_reset");
         if (this.tagFile.exists()) {
+            this.gameWorld.setTime(0);
             this.tagFile.delete();
         }
 
@@ -96,7 +99,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
         LinkedList<TablistGroupType> types = new LinkedList<>();
         types.add(Group.getTablistType());
-        this.gameTablist = Server.getScoreboardManager().registerNewGroupTablist("endgame", Tablist.Type.HEALTH, types, (e, tablist) -> tablist.addEntry(e.getUser()), (e, tablist) -> tablist.removeEntry(e.getUser()));
+        this.gameTablist = Server.getScoreboardManager().registerNewGroupTablist("endgame", Tablist.Type.HEALTH,
+                types, (e, tablist) -> tablist.addEntry(e.getUser()), (e, tablist) -> tablist.removeEntry(e.getUser()));
         this.gameTablist.setHeader("§5End§6Game \n§7Server: " + Server.getName());
         this.updateTablistTime();
         Server.getScoreboardManager().setActiveTablist(this.gameTablist);
@@ -109,8 +113,10 @@ public class EndGameServerManager extends ServerManager implements Listener {
     @EventHandler
     public void onUserJoin(UserJoinEvent e) {
         User user = e.getUser();
-        user.sendPluginMessage(Plugin.END_GAME, ChatColor.WARNING + "" + ChatColor.BOLD + "If you or one of your " + "friends die, the whole world will be set back!");
-        user.sendPluginMessage(Plugin.END_GAME, ChatColor.PUBLIC + "To play normal survival-build, " + "please use the survival-server");
+        user.sendPluginMessage(Plugin.END_GAME, ChatColor.WARNING + "" + ChatColor.BOLD +
+                "If you or one of your friends die, the whole world will be set back!");
+        user.sendPluginMessage(Plugin.END_GAME, ChatColor.PUBLIC + "To play normal survival-build, " +
+                "please use the survival-server");
         user.getPlayer().setInvulnerable(false);
         if (!this.isTimeRunning) {
             user.setGameMode(GameMode.ADVENTURE);
@@ -196,6 +202,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
             user.getPlayer().setInvulnerable(true);
         }
         this.setTimeRunning(false);
+        this.gameWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
     }
 
     public void resumeGame() {
@@ -207,6 +214,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
             user.lockLocation(false);
             user.getPlayer().setInvulnerable(false);
         }
+        this.gameWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
         this.setTimeRunning(true);
     }
 
@@ -236,21 +244,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
     }
 
     private void updateTablistTime() {
-        StringBuilder ts = new StringBuilder();
-        if (this.time > 3600) {
-            ts.append(this.time / 3600);
-            ts.append("h ");
-        }
-        if (this.time > 60) {
-            ts.append((this.time % 3600) / 60);
-            ts.append("min ");
-        }
-        ts.append(this.time % 60);
-        ts.append("s");
-        this.gameTablist.setFooter("§6Time: §9" + ts);
+        this.gameTablist.setFooter("§6Time: §9" + Chat.getTimeString(this.time));
     }
-
-
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
@@ -274,18 +269,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
     public void onEntityDeath(EntityDeathEvent e) {
         if (e.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
             this.setTimeRunning(false);
-            StringBuilder ts = new StringBuilder();
-            if (this.time > 3600) {
-                ts.append(this.time / 3600);
-                ts.append("h ");
-            }
-            if (this.time > 60) {
-                ts.append((this.time % 3600) / 60);
-                ts.append("min ");
-            }
-            ts.append(this.time % 60);
-            ts.append("s");
-            this.broadcastGameMessage(ChatColor.WARNING + "You defeated Minecraft in " + ChatColor.VALUE + ts);
+            this.broadcastGameMessage(ChatColor.WARNING + "You defeated Minecraft in " + ChatColor.VALUE + Chat.getTimeString(this.time));
         }
     }
 
