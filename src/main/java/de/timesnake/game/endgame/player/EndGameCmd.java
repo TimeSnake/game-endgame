@@ -30,7 +30,8 @@ public class EndGameCmd implements CommandListener {
             }
 
             User user = sender.getUser();
-            if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner())) || sender.hasPermission("endgame.password.other", 2404, false)) {
+            if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner()))
+                    || sender.hasPermission("endgame.password.other", 2404, false)) {
                 sender.sendPluginMessage(ChatColor.WARNING + "You are not the server owner");
                 return;
             }
@@ -52,7 +53,8 @@ public class EndGameCmd implements CommandListener {
         } else if (args.get(0).equalsIgnoreCase("resume")) {
             if (sender.isPlayer(false)) {
                 User user = sender.getUser();
-                if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner())) || sender.hasPermission("endgame.resume.other", 2407, false)) {
+                if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner()))
+                        || sender.hasPermission("endgame.resume.other", 2407, false)) {
                     if (!EndGameServerManager.getInstance().isTimeRunning()) {
                         EndGameServerManager.getInstance().resumeGame();
                     }
