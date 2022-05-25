@@ -68,7 +68,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
     private LocShowManager locShowManager;
 
     public void onEndGameEnable() {
-        owner = Database.getEndGame().getUserFromServer(Database.getServers().getServer(Type.Server.GAME, Server.getPort()));
+        owner = Database.getEndGame().getUserFromServer(Database.getServers().getServer(Type.Server.GAME,
+                Server.getPort()));
         if (owner == null) {
             Server.printWarning(Plugin.END_GAME, "Server-owner not defined");
         } else {
@@ -176,7 +177,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
                     e.printStackTrace();
                 }
             }
-            this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getPort(), MessageType.Server.RESTART, 40));
+            this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getPort(),
+                    MessageType.Server.RESTART, 40));
             Bukkit.shutdown();
         }, 5 * 20, GameEndGame.getPlugin());
     }

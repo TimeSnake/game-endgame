@@ -31,7 +31,8 @@ public class GameEndGame extends JavaPlugin {
         pm.registerEvents(EndGameServerManager.getInstance(), this);
 
         Server.getCommandManager().addCommand(this, "endgame", List.of("eg"), new EndGameCmd(), Plugin.END_GAME);
-        Server.getCommandManager().addCommand(this, "loc", List.of("location", "pos", "position"), new LocCmd(), Plugin.END_GAME);
+        Server.getCommandManager().addCommand(this, "loc", List.of("location", "pos", "position"), new LocCmd(),
+                Plugin.END_GAME);
         Server.getCommandManager().addCommand(this, "locshow", new LocShowCmd(), Plugin.END_GAME);
 
         EndGameServerManager.getInstance().onEndGameEnable();

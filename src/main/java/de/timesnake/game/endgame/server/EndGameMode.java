@@ -7,7 +7,10 @@ import java.util.List;
 
 public enum EndGameMode {
 
-    EASY("easy", Difficulty.EASY, false), NORMAL("normal", Difficulty.NORMAL, false), HARD("hard", Difficulty.HARD, false), ULTRA_HARD("ultra_hard", Difficulty.HARD, true);
+    EASY("easy", Difficulty.EASY, false),
+    NORMAL("normal", Difficulty.NORMAL, false),
+    HARD("hard", Difficulty.HARD, false),
+    ULTRA_HARD("ultra_hard", Difficulty.HARD, true);
 
     private final String name;
     private final Difficulty difficulty;
