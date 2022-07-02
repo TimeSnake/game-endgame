@@ -33,11 +33,11 @@ public class LocShowManager {
         }
 
         Sideboard sideboard = EndGameServer.getScoreboardManager().registerNewSideboard("endgameloc", "§6§lLocation");
-        sideboard.setScore(5, "§cName: §f" + name);
-        sideboard.setScore(4, "-------------------");
-        sideboard.setScore(3, "§9X: §f" + location.getBlockX());
-        sideboard.setScore(2, "§9Y: §f" + location.getBlockY());
-        sideboard.setScore(1, "§9Z: §f" + location.getBlockZ());
+        sideboard.setScore(6, "§cName: §f" + name);
+        sideboard.setScore(5, "-------------------");
+        sideboard.setScore(4, "§9X: §f" + location.getBlockX());
+        sideboard.setScore(3, "§9Y: §f" + location.getBlockY());
+        sideboard.setScore(2, "§9Z: §f" + location.getBlockZ());
         user.setSideboard(sideboard);
 
         BukkitTask task = Server.runTaskTimerSynchrony(() -> {
@@ -62,27 +62,28 @@ public class LocShowManager {
                 }
 
                 if (angle < -2.749 || angle >= 2.749) { // -7/8 pi
-                    direction = "↓";
+                    direction = "⬇";
                 } else if (angle < -1.963) { // -5/8 pi
-                    direction = "↘";
+                    direction = "⬊";
                 } else if (angle < -1.178) { // -3/8 pi
-                    direction = "→";
+                    direction = "➡";
                 } else if (angle < -0.393) { // -1/8 pi
-                    direction = "↗";
+                    direction = "⬈";
                 } else if (angle < 0.393) { // 1/8 pi
-                    direction = "↑";
+                    direction = "⬆";
                 } else if (angle < 1.178) { // 3/8 pi
-                    direction = "↖";
+                    direction = "⬉";
                 } else if (angle < 1.963) { // 5/8 p
-                    direction = "←";
+                    direction = "⬅";
                 } else if (angle < 2.749) { // 7/8 pi
-                    direction = "↙";
+                    direction = "⬋";
                 }
             }
 
             int heightDelta = location.getBlockY() - userLoc.getBlockY();
 
-            sideboard.setScore(0, "§6§l     " + direction + "    ↕ §6" + heightDelta + "m");
+            sideboard.setScore(1, "§6§l     " + direction + "    ↕ §6" + heightDelta + "m");
+            sideboard.setScore(0, "§6    " + ((int) userLoc.distance(location)));
         }, 0, 20, GameEndGame.getPlugin());
 
         this.trackedLocationByUser.put(user, new Tuple<>(location, task));
