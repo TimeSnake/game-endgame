@@ -32,6 +32,10 @@ public class LocShowManager {
             this.trackedLocationByUser.get(user).getB().cancel();
         }
 
+        if (user.getWorld().equals(location.getWorld())) {
+            return;
+        }
+
         Sideboard sideboard = EndGameServer.getScoreboardManager().registerNewSideboard("endgameloc", "§6§lLocation");
         sideboard.setScore(6, "§cName: §f" + name);
         sideboard.setScore(5, "-------------------");
