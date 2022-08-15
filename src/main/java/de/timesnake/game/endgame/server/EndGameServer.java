@@ -7,12 +7,11 @@ import java.util.UUID;
 
 public class EndGameServer extends Server {
 
-    private static final EndGameServerManager server = EndGameServerManager.getInstance();
-
     public static void resetGame() {
         server.resetGame();
     }
 
+    @Deprecated
     public static void broadcastGameMessage(String message) {
         server.broadcastGameMessage(message);
     }
@@ -52,4 +51,6 @@ public class EndGameServer extends Server {
     public static LocShowManager getLocShowManager() {
         return server.getLocShowManager();
     }
+
+    private static final EndGameServerManager server = EndGameServerManager.getInstance();
 }
