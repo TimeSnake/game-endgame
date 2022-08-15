@@ -2,14 +2,15 @@ package de.timesnake.game.endgame.player;
 
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.ChatColor;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
-import net.md_5.bungee.api.chat.ClickEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Instrument;
 import org.bukkit.Note;
 
@@ -35,7 +36,10 @@ public class LocCmd implements CommandListener {
         ExLocation loc = sender.getUser().getExLocation();
         String name = args.toMessage();
 
-        Server.broadcastClickableMessage(Server.getChat().getSenderMember(sender.getUser()) + ChatColor.PUBLIC + name + " " + ChatColor.VALUE + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), "/locshow " + name, "Click to save the location in the sideboard", ClickEvent.Action.RUN_COMMAND);
+        Server.broadcastClickableMessage(Server.getChat().getSenderMember(sender.getUser())
+                        .append(Component.text(name, ExTextColor.PUBLIC))
+                        .append(Component.text(" " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ExTextColor.VALUE)),
+                "/locshow " + name, Component.text("Click to save the location in the sideboard"), ClickEvent.Action.RUN_COMMAND);
         Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
 
         EndGameServer.getLocShowManager().addLocation(name, loc.getExBlock().getLocation());

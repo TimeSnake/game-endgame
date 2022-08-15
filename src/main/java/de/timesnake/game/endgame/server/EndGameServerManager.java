@@ -2,13 +2,11 @@ package de.timesnake.game.endgame.server;
 
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.ServerManager;
-import de.timesnake.basic.bukkit.util.chat.ChatColor;
-import de.timesnake.basic.bukkit.util.permission.Group;
+import de.timesnake.basic.bukkit.util.chat.DisplayGroup;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.user.event.UserDamageByUserEvent;
 import de.timesnake.basic.bukkit.util.user.event.UserJoinEvent;
 import de.timesnake.basic.bukkit.util.user.scoreboard.Tablist;
-import de.timesnake.basic.bukkit.util.user.scoreboard.TablistGroupType;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.channel.util.message.ChannelServerMessage;
 import de.timesnake.channel.util.message.MessageType;
@@ -18,7 +16,10 @@ import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
 import de.timesnake.game.endgame.player.LocShowManager;
 import de.timesnake.library.basic.util.Status;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Chat;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -33,7 +34,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.UUID;
 
 public class EndGameServerManager extends ServerManager implements Listener {
@@ -98,10 +98,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
         this.locShowManager = new LocShowManager();
 
-        LinkedList<TablistGroupType> types = new LinkedList<>();
-        types.add(Group.getTablistType());
         this.gameTablist = Server.getScoreboardManager().registerNewGroupTablist("endgame", Tablist.Type.HEALTH,
-                types, (e, tablist) -> tablist.addEntry(e.getUser()), (e, tablist) -> tablist.removeEntry(e.getUser()));
+                DisplayGroup.MAIN_TABLIST_GROUPS, (e, tablist) -> tablist.addEntry(e.getUser()), (e, tablist) -> tablist.removeEntry(e.getUser()));
         this.gameTablist.setHeader("§5End§6Game \n§7Server: " + Server.getName());
         this.updateTablistTime();
         Server.getScoreboardManager().setActiveTablist(this.gameTablist);
@@ -114,10 +112,10 @@ public class EndGameServerManager extends ServerManager implements Listener {
     @EventHandler
     public void onUserJoin(UserJoinEvent e) {
         User user = e.getUser();
-        user.sendPluginMessage(Plugin.END_GAME, ChatColor.WARNING + "" + ChatColor.BOLD +
-                "If you or one of your friends die, the whole world will be set back!");
-        user.sendPluginMessage(Plugin.END_GAME, ChatColor.PUBLIC + "To play normal survival-build, " +
-                "please use the survival-server");
+        user.sendPluginMessage(Plugin.END_GAME, Component.text("If you or one of your friends die, the whole " +
+                "world will be set back!", ExTextColor.WARNING, TextDecoration.BOLD));
+        user.sendPluginMessage(Plugin.END_GAME, Component.text("To play normal survival-build, " +
+                "please use the survival-server", ExTextColor.PUBLIC));
         user.getPlayer().setInvulnerable(false);
         if (!this.isTimeRunning) {
             user.setGameMode(GameMode.ADVENTURE);
@@ -138,7 +136,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
         }
 
         this.locShowManager.reset();
-        Server.broadcastMessage(Plugin.END_GAME, ChatColor.WARNING + "Starting world reset");
+        Server.broadcastMessage(Plugin.END_GAME, Component.text("Starting world reset", ExTextColor.WARNING));
         for (User user : Server.getUsers()) {
             user.resetSideboard();
             user.switchToLobbyLast();
@@ -183,8 +181,13 @@ public class EndGameServerManager extends ServerManager implements Listener {
         }, 5 * 20, GameEndGame.getPlugin());
     }
 
+    public void broadcastGameMessage(Component message) {
+        Server.broadcastMessage(Plugin.END_GAME, message);
+    }
+
+    @Deprecated
     public void broadcastGameMessage(String message) {
-        Server.broadcastMessage(Plugin.END_GAME, ChatColor.PUBLIC + message);
+        Server.broadcastMessage(Plugin.END_GAME, Component.text(message, ExTextColor.PUBLIC));
     }
 
     public UUID getOwner() {
@@ -196,7 +199,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
     }
 
     public void pauseGame() {
-        this.broadcastGameMessage(ChatColor.WARNING + "Game paused");
+        this.broadcastGameMessage(Component.text("Game paused", ExTextColor.PUBLIC));
         for (User user : Server.getUsers()) {
             user.getPlayer().setGameMode(GameMode.ADVENTURE);
             user.lockInventory();
@@ -208,7 +211,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
     }
 
     public void resumeGame() {
-        this.broadcastGameMessage(ChatColor.WARNING + "Game resumed");
+        this.broadcastGameMessage(Component.text("Game resumed", ExTextColor.PUBLIC));
         for (User user : Server.getUsers()) {
             user.getPlayer().setGameMode(GameMode.SURVIVAL);
             user.unlockInventory();
@@ -251,10 +254,11 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        e.setDeathMessage("");
+        e.deathMessage(Component.empty());
         User user = Server.getUser(e.getEntity());
-        Server.broadcastMessage(Plugin.END_GAME, ChatColor.VALUE + user.getChatName() + ChatColor.WARNING + " died!");
-        this.broadcastGameMessage(ChatColor.WARNING + "Game stopped");
+        Server.broadcastMessage(Plugin.END_GAME, user.getChatNameComponent()
+                .append(Component.text(" died!", ExTextColor.WARNING)));
+        this.broadcastGameMessage(Component.text("Game stopped", ExTextColor.WARNING));
         this.setTimeRunning(false);
         for (User u : Server.getUsers()) {
             u.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -271,7 +275,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
     public void onEntityDeath(EntityDeathEvent e) {
         if (e.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
             this.setTimeRunning(false);
-            this.broadcastGameMessage(ChatColor.WARNING + "You defeated Minecraft in " + ChatColor.VALUE + Chat.getTimeString(this.time));
+            this.broadcastGameMessage(Component.text("You defeated Minecraft in ", ExTextColor.WARNING)
+                    .append(Component.text(Chat.getTimeString(this.time), ExTextColor.VALUE)));
         }
     }
 
@@ -287,7 +292,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
     public void setMode(EndGameMode mode) {
         this.mode = mode;
 
-        this.broadcastGameMessage(ChatColor.WARNING + "Difficulty: " + mode.getName().replace("_", " "));
+        this.broadcastGameMessage(Component.text("Difficulty: ", ExTextColor.WARNING)
+                .append(Component.text(mode.getName().replace("_", " "), ExTextColor.VALUE)));
 
         this.gameWorld.setDifficulty(mode.getDifficulty());
         this.gameWorldNether.setDifficulty(mode.getDifficulty());
