@@ -262,7 +262,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
         this.setTimeRunning(false);
         for (User u : Server.getUsers()) {
             u.getPlayer().setGameMode(GameMode.SPECTATOR);
-            u.asSender(Plugin.END_GAME).sendMessageCommandHelp("Reset", "eg reset");
+            u.asSender(Plugin.END_GAME).sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL),
+                    Component.text("eg reset", ExTextColor.VALUE));
         }
     }
 
