@@ -175,7 +175,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
                     e.printStackTrace();
                 }
             }
-            this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getPort(),
+            this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getName(),
                     MessageType.Server.RESTART, 40));
             Bukkit.shutdown();
         }, 5 * 20, GameEndGame.getPlugin());
