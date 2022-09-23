@@ -10,8 +10,6 @@ import de.timesnake.basic.bukkit.util.user.scoreboard.Tablist;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.channel.util.message.ChannelServerMessage;
 import de.timesnake.channel.util.message.MessageType;
-import de.timesnake.database.util.Database;
-import de.timesnake.database.util.object.Type;
 import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
 import de.timesnake.game.endgame.player.LocShowManager;
@@ -20,7 +18,6 @@ import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Chat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -32,8 +29,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 public class EndGameServerManager extends ServerManager implements Listener {
@@ -63,19 +58,9 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
     private boolean reset = false;
 
-    private File tagFile;
-
     private LocShowManager locShowManager;
 
     public void onEndGameEnable() {
-        owner = Database.getEndGame().getUserFromServer(Database.getServers().getServer(Type.Server.GAME,
-                Server.getPort()));
-        if (owner == null) {
-            Server.printWarning(Plugin.END_GAME, "Server-owner not defined");
-        } else {
-            ownerName = Database.getUsers().getUser(owner).getName();
-        }
-
         lobbyWorld = Server.getWorldManager().createWorld("endgame");
         gameWorld = Server.getWorldManager().createWorld("world");
         gameWorldNether = Server.getWorldManager().createWorld("world_nether");
@@ -88,12 +73,6 @@ public class EndGameServerManager extends ServerManager implements Listener {
         this.time = file.getTime();
         if (this.time == null) {
             this.time = 0;
-        }
-
-        this.tagFile = new File(Bukkit.getWorldContainer() + File.separator + "eg_reset");
-        if (this.tagFile.exists()) {
-            this.gameWorld.setTime(0);
-            this.tagFile.delete();
         }
 
         this.locShowManager = new LocShowManager();
@@ -167,17 +146,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
             this.time = 0;
             this.updateTablistTime();
-            if (!this.tagFile.exists()) {
-                try {
-                    this.tagFile.createNewFile();
-                    Server.printText(Plugin.END_GAME, "Created tag file");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
             this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getName(),
-                    MessageType.Server.RESTART, 40));
-            Bukkit.shutdown();
+                    MessageType.Server.KILL_DESTROY, ProcessHandle.current().pid()));
         }, 5 * 20, GameEndGame.getPlugin());
     }
 
@@ -201,7 +171,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
     public void pauseGame() {
         this.broadcastGameMessage(Component.text("Game paused", ExTextColor.PUBLIC));
         for (User user : Server.getUsers()) {
-            user.getPlayer().setGameMode(GameMode.ADVENTURE);
+            user.setGameMode(GameMode.ADVENTURE);
             user.lockInventory();
             user.lockLocation(true);
             user.getPlayer().setInvulnerable(true);
@@ -213,7 +183,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
     public void resumeGame() {
         this.broadcastGameMessage(Component.text("Game resumed", ExTextColor.PUBLIC));
         for (User user : Server.getUsers()) {
-            user.getPlayer().setGameMode(GameMode.SURVIVAL);
+            user.setGameMode(GameMode.SURVIVAL);
             user.unlockInventory();
             user.unlockBlocKBreakPlace();
             user.lockLocation(false);
@@ -261,7 +231,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
         this.broadcastGameMessage(Component.text("Game stopped", ExTextColor.WARNING));
         this.setTimeRunning(false);
         for (User u : Server.getUsers()) {
-            u.getPlayer().setGameMode(GameMode.SPECTATOR);
+            u.setGameMode(GameMode.SPECTATOR);
             u.asSender(Plugin.END_GAME).sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL),
                     Component.text("eg reset", ExTextColor.VALUE));
         }
