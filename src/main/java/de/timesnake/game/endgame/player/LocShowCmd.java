@@ -8,6 +8,7 @@ import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
+import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ public class LocShowCmd implements CommandListener {
 
         if (!args.isLengthHigherEquals(1, true)) {
             user.resetSideboard();
-            sender.sendMessageCommandHelp("Show location", "locshow <name>");
+            sender.sendMessageCommandHelp(Component.text("Show location"), Component.text("locshow <name>"));
             return;
         }
 
