@@ -32,10 +32,6 @@ public class LocShowManager {
             this.trackedLocationByUser.get(user).getB().cancel();
         }
 
-        if (user.getWorld().equals(location.getWorld())) {
-            return;
-        }
-
         Sideboard sideboard = EndGameServer.getScoreboardManager().registerNewSideboard("endgameloc", "§6§lLocation");
         sideboard.setScore(6, "§cName: §f" + name);
         sideboard.setScore(5, "-------------------");
@@ -46,6 +42,12 @@ public class LocShowManager {
 
         BukkitTask task = Server.runTaskTimerSynchrony(() -> {
             Location userLoc = user.getLocation();
+
+            if (!userLoc.getWorld().equals(location.getWorld())) {
+                sideboard.setScore(1, "§6§l  other world");
+                sideboard.setScore(0, "§6    ");
+                return;
+            }
 
             Vector locVector = location.toVector().subtract(userLoc.toVector());
 
