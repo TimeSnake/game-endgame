@@ -7,6 +7,8 @@ import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.extension.util.chat.Code;
+import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
 import net.kyori.adventure.text.Component;
@@ -19,13 +21,15 @@ import java.util.List;
 
 public class LocCmd implements CommandListener {
 
+    private Code.Permission perm;
+
     @Override
     public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
         if (!sender.isPlayer(true)) {
             return;
         }
 
-        if (!sender.hasPermission("endgame.location", 2408)) {
+        if (!sender.hasPermission(this.perm)) {
             return;
         }
 
@@ -41,7 +45,8 @@ public class LocCmd implements CommandListener {
                 .append(Component.text(name, ExTextColor.PUBLIC))
                 .append(Component.text(" " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ExTextColor.VALUE))
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + name))
-                .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to save the location in the sideboard"))));
+                .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        Component.text("Click to save the location in the sideboard"))));
         Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
 
         EndGameServer.getLocShowManager().addLocation(name, loc.getExBlock().getLocation());
@@ -53,5 +58,10 @@ public class LocCmd implements CommandListener {
             return List.of("lava", "cave", "village", "portal");
         }
         return List.of();
+    }
+
+    @Override
+    public void loadCodes(Plugin plugin) {
+        this.perm = plugin.createPermssionCode("end", "endgame.location");
     }
 }

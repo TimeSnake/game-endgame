@@ -1,15 +1,14 @@
 package de.timesnake.game.endgame.player;
 
-import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.chat.Argument;
 import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
-import de.timesnake.basic.bukkit.util.user.User;
-import de.timesnake.database.util.object.TooLongEntryException;
 import de.timesnake.game.endgame.server.EndGameMode;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.game.endgame.server.EndGameServerManager;
 import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.extension.util.chat.Code;
+import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
 import net.kyori.adventure.text.Component;
@@ -18,6 +17,10 @@ import java.util.List;
 
 public class EndGameCmd implements CommandListener {
 
+    private Code.Permission resumePerm;
+    private Code.Permission pausePerm;
+    private Code.Permission resetPerm;
+
     @Override
     public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
 
@@ -25,76 +28,24 @@ public class EndGameCmd implements CommandListener {
             return;
         }
 
-        if (args.get(0).equalsIgnoreCase("password")) {
-            if (!sender.isPlayer(true)) {
+        if (args.get(0).equalsIgnoreCase("resume")) {
+            if (!sender.hasPermission(this.resumePerm, false)) {
                 return;
             }
-
-            User user = sender.getUser();
-            if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner()))
-                    || sender.hasPermission("endgame.password.other", 2404, false)) {
-                sender.sendPluginMessage(Component.text("You are not the server owner", ExTextColor.WARNING));
-                return;
-            }
-
-            if (args.isLengthHigherEquals(3, false)) {
-                sender.sendPluginMessage(Component.text("Spaces are not allowed", ExTextColor.WARNING));
-                return;
-            }
-            String password = args.get(1).getString();
-
-            try {
-                Server.setPassword(password);
-            } catch (TooLongEntryException e) {
-                sender.sendPluginMessage(Component.text("Too long password, max length is 255.", ExTextColor.WARNING));
-                return;
-            }
-            sender.sendPluginMessage(Component.text("Updated password to ", ExTextColor.PERSONAL)
-                    .append(Component.text(password, ExTextColor.VALUE)));
-
-        } else if (args.get(0).equalsIgnoreCase("resume")) {
-            if (sender.isPlayer(false)) {
-                User user = sender.getUser();
-                if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner()))
-                        || sender.hasPermission("endgame.resume.other", 2407, false)) {
-                    if (!EndGameServerManager.getInstance().isTimeRunning()) {
-                        EndGameServerManager.getInstance().resumeGame();
-                    }
-                } else {
-                    sender.sendPluginMessage(Component.text("You are not the server owner", ExTextColor.WARNING));
-                }
-            } else {
-                if (!EndGameServerManager.getInstance().isTimeRunning()) {
-                    EndGameServerManager.getInstance().resumeGame();
-                }
+            if (!EndGameServerManager.getInstance().isTimeRunning()) {
+                EndGameServerManager.getInstance().resumeGame();
             }
 
 
         } else if (args.get(0).equalsIgnoreCase("pause")) {
-            if (sender.isPlayer(false)) {
-                User user = sender.getUser();
-                if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner())) || sender.hasPermission("endgame.pause.other", 2405, false)) {
-                    if (EndGameServerManager.getInstance().isTimeRunning()) {
-                        EndGameServerManager.getInstance().pauseGame();
-                    }
-                } else {
-                    sender.sendPluginMessage(Component.text("You are not the server owner", ExTextColor.WARNING));
-                }
-            } else {
+            if (sender.hasPermission(this.pausePerm, false)) {
                 if (EndGameServerManager.getInstance().isTimeRunning()) {
                     EndGameServerManager.getInstance().pauseGame();
                 }
             }
 
         } else if (args.get(0).equalsIgnoreCase("reset")) {
-            if (sender.isPlayer(false)) {
-                User user = sender.getUser();
-                if (user.getUniqueId().equals((EndGameServerManager.getInstance().getOwner())) || sender.hasPermission("endgame.reset.other", 2406, false)) {
-                    EndGameServerManager.getInstance().resetGame();
-                } else {
-                    sender.sendPluginMessage(Component.text("You are not the server owner", ExTextColor.WARNING));
-                }
-            } else {
+            if (sender.hasPermission(this.resetPerm, false)) {
                 EndGameServerManager.getInstance().resetGame();
             }
         } else if (args.get(0).equalsIgnoreCase("mode")) {
@@ -119,6 +70,13 @@ public class EndGameCmd implements CommandListener {
             return EndGameMode.getNames();
         }
         return List.of();
+    }
+
+    @Override
+    public void loadCodes(Plugin plugin) {
+        this.resumePerm = plugin.createPermssionCode("end", "endgame.resume");
+        this.pausePerm = plugin.createPermssionCode("end", "endgame.pause");
+        this.resetPerm = plugin.createPermssionCode("end", "endgame.reset");
     }
 
 }
