@@ -29,20 +29,13 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.UUID;
-
 public class EndGameServerManager extends ServerManager implements Listener {
 
     public static EndGameServerManager getInstance() {
         return (EndGameServerManager) ServerManager.getInstance();
     }
 
-    private UUID owner;
-    private String ownerName;
-
     private DataFile file;
-
-    private ExWorld lobbyWorld;
 
     private ExWorld gameWorld;
     private ExWorld gameWorldNether;
@@ -61,7 +54,6 @@ public class EndGameServerManager extends ServerManager implements Listener {
     private LocShowManager locShowManager;
 
     public void onEndGameEnable() {
-        lobbyWorld = Server.getWorldManager().createWorld("endgame");
         gameWorld = Server.getWorldManager().createWorld("world");
         gameWorldNether = Server.getWorldManager().createWorld("world_nether");
         gameWorldEnd = Server.getWorldManager().createWorld("world_the_end");
@@ -158,14 +150,6 @@ public class EndGameServerManager extends ServerManager implements Listener {
     @Deprecated
     public void broadcastGameMessage(String message) {
         Server.broadcastMessage(Plugin.END_GAME, Component.text(message, ExTextColor.PUBLIC));
-    }
-
-    public UUID getOwner() {
-        return owner;
-    }
-
-    public String getOwnerName() {
-        return ownerName;
     }
 
     public void pauseGame() {
