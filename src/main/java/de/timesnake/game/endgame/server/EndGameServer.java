@@ -3,8 +3,6 @@ package de.timesnake.game.endgame.server;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.game.endgame.player.LocShowManager;
 
-import java.util.UUID;
-
 public class EndGameServer extends Server {
 
     public static void resetGame() {
@@ -14,14 +12,6 @@ public class EndGameServer extends Server {
     @Deprecated
     public static void broadcastGameMessage(String message) {
         server.broadcastGameMessage(message);
-    }
-
-    public static UUID getOwner() {
-        return server.getOwner();
-    }
-
-    public static String getOwnerName() {
-        return server.getOwnerName();
     }
 
     public static void pauseGame() {

@@ -6,6 +6,7 @@ import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.player.EndGameCmd;
 import de.timesnake.game.endgame.player.LocCmd;
 import de.timesnake.game.endgame.player.LocShowCmd;
+import de.timesnake.game.endgame.player.TriangulationCmd;
 import de.timesnake.game.endgame.server.EndGameServerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -14,6 +15,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.List;
 
 public class GameEndGame extends JavaPlugin {
+
+    public static GameEndGame getPlugin() {
+        return plugin;
+    }
 
     private static GameEndGame plugin;
 
@@ -30,10 +35,13 @@ public class GameEndGame extends JavaPlugin {
 
         pm.registerEvents(EndGameServerManager.getInstance(), this);
 
-        Server.getCommandManager().addCommand(this, "endgame", List.of("eg"), new EndGameCmd(), Plugin.END_GAME);
-        Server.getCommandManager().addCommand(this, "loc", List.of("location", "pos", "position"), new LocCmd(),
+        Server.getCommandManager().addCommand(this, "endgame", List.of("eg"), new EndGameCmd(),
                 Plugin.END_GAME);
+        Server.getCommandManager().addCommand(this, "loc", List.of("location", "pos", "position"),
+                new LocCmd(), Plugin.END_GAME);
         Server.getCommandManager().addCommand(this, "locshow", new LocShowCmd(), Plugin.END_GAME);
+        Server.getCommandManager().addCommand(this, "triangular", List.of("stronghold", "tria"),
+                new TriangulationCmd(), Plugin.END_GAME);
 
         EndGameServerManager.getInstance().onEndGameEnable();
 
@@ -42,9 +50,5 @@ public class GameEndGame extends JavaPlugin {
     @Override
     public void onDisable() {
         EndGameServerManager.getInstance().onEndGameDisable();
-    }
-
-    public static GameEndGame getPlugin() {
-        return plugin;
     }
 }
