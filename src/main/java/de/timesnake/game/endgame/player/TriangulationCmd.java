@@ -37,6 +37,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Location;
 
 import java.util.List;
+import java.util.UUID;
 
 public class TriangulationCmd implements CommandListener {
 
@@ -92,12 +93,13 @@ public class TriangulationCmd implements CommandListener {
             double distanceFromSecond = locationDistance / Math.sin(angle) * Math.sin(firstLocation.getPitch());
 
             Location stronghold = secondLocation.clone().add(secondLocation.getDirection().normalize().multiply(distanceFromSecond));
-            EndGameServer.getLocShowManager().addLocation("stronghold", ExLocation.fromLocation(stronghold));
+            UUID uuid = UUID.randomUUID();
+            EndGameServer.getLocShowManager().addLocation(uuid, "stronghold", ExLocation.fromLocation(stronghold));
 
             Server.broadcastMessage(Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
                     .append(Component.text("stronghold", ExTextColor.PUBLIC))
                     .append(Component.text(" " + stronghold.getBlockX() + " " + stronghold.getBlockY() + " " + stronghold.getBlockZ(), ExTextColor.VALUE))
-                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow stronghold"))
+                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
                     .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
                             Component.text("Click to save the location in the sideboard"))));
         } else {

@@ -30,19 +30,20 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class LocShowManager {
 
 
-    private final HashMap<String, ExLocation> locationsByName = new HashMap<>();
+    private final HashMap<UUID, Tuple<String, ExLocation>> locationsById = new HashMap<>();
     private final HashMap<User, Tuple<ExLocation, BukkitTask>> trackedLocationByUser = new HashMap<>();
 
-    public void addLocation(String name, ExLocation loc) {
-        this.locationsByName.put(name, loc);
+    public void addLocation(UUID uuid, String name, ExLocation loc) {
+        this.locationsById.put(uuid, new Tuple<>(name, loc));
     }
 
-    public HashMap<String, ExLocation> getLocationsByName() {
-        return locationsByName;
+    public HashMap<UUID, Tuple<String, ExLocation>> getLocationsById() {
+        return locationsById;
     }
 
     public void setTrackedLocation(User user, String name, ExLocation location) {
@@ -107,14 +108,14 @@ public class LocShowManager {
             int heightDelta = location.getBlockY() - userLoc.getBlockY();
 
             sideboard.setScore(1, "§6§l     " + direction + "    ↕ §6" + heightDelta + "m");
-            sideboard.setScore(0, "§6    " + ((int) userLoc.distance(location)));
+            sideboard.setScore(0, "§6     " + ((int) userLoc.distance(location)));
         }, 0, 20, GameEndGame.getPlugin());
 
         this.trackedLocationByUser.put(user, new Tuple<>(location, task));
     }
 
     public void reset() {
-        this.locationsByName.clear();
+        this.locationsById.clear();
         for (Tuple<ExLocation, BukkitTask> entry : this.trackedLocationByUser.values()) {
             entry.getB().cancel();
         }

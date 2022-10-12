@@ -47,7 +47,7 @@ public class EndGameCmd implements CommandListener {
         }
 
         if (args.get(0).equalsIgnoreCase("resume")) {
-            if (!sender.hasPermission(this.resumePerm, false)) {
+            if (!sender.hasPermission(this.resumePerm, true)) {
                 return;
             }
             if (!EndGameServerManager.getInstance().isTimeRunning()) {
@@ -56,14 +56,14 @@ public class EndGameCmd implements CommandListener {
 
 
         } else if (args.get(0).equalsIgnoreCase("pause")) {
-            if (sender.hasPermission(this.pausePerm, false)) {
+            if (sender.hasPermission(this.pausePerm, true)) {
                 if (EndGameServerManager.getInstance().isTimeRunning()) {
                     EndGameServerManager.getInstance().pauseGame();
                 }
             }
 
         } else if (args.get(0).equalsIgnoreCase("reset")) {
-            if (sender.hasPermission(this.resetPerm, false)) {
+            if (sender.hasPermission(this.resetPerm, true)) {
                 EndGameServerManager.getInstance().resetGame();
             }
         } else if (args.get(0).equalsIgnoreCase("mode")) {
