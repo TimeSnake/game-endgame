@@ -36,6 +36,7 @@ import org.bukkit.Instrument;
 import org.bukkit.Note;
 
 import java.util.List;
+import java.util.UUID;
 
 public class LocCmd implements CommandListener {
 
@@ -58,16 +59,17 @@ public class LocCmd implements CommandListener {
 
         ExLocation loc = sender.getUser().getExLocation();
         String name = args.toMessage();
+        UUID uuid = UUID.randomUUID();
 
         Server.broadcastMessage(Server.getChat().getSenderMember(sender.getUser())
                 .append(Component.text(name, ExTextColor.PUBLIC))
                 .append(Component.text(" " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ExTextColor.VALUE))
-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + name))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
                 .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
                         Component.text("Click to save the location in the sideboard"))));
         Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
 
-        EndGameServer.getLocShowManager().addLocation(name, loc.getExBlock().getLocation());
+        EndGameServer.getLocShowManager().addLocation(uuid, name, loc.getExBlock().getLocation());
     }
 
     @Override

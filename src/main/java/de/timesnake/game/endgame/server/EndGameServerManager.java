@@ -156,7 +156,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
             this.time = 0;
             this.updateTablistTime();
-            this.getChannel().sendMessageToProxy(new ChannelServerMessage<>(this.getName(),
+            this.getChannel().sendMessage(new ChannelServerMessage<>(this.getName(),
                     MessageType.Server.KILL_DESTROY, ProcessHandle.current().pid()));
         }, 5 * 20, GameEndGame.getPlugin());
     }

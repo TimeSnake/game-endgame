@@ -24,6 +24,8 @@ import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
+import de.timesnake.library.basic.util.Tuple;
+import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
@@ -32,6 +34,7 @@ import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class LocShowCmd implements CommandListener {
 
@@ -56,20 +59,27 @@ public class LocShowCmd implements CommandListener {
             return;
         }
 
-        HashMap<String, ExLocation> locationsByName = EndGameServer.getLocShowManager().getLocationsByName();
-        String name = args.toMessage();
-        if (locationsByName.get(name) == null) {
-            sender.sendMessageNotExist(name, this.locationNotExists, "location");
+        HashMap<UUID, Tuple<String, ExLocation>> locationsByName = EndGameServer.getLocShowManager().getLocationsById();
+
+        if (!args.get(0).isUUID(false)) {
+            sender.sendPluginMessage(Component.text("Invalid location name ", ExTextColor.WARNING));
             return;
         }
 
-        ExLocation loc = locationsByName.get(name);
+        UUID uuid = UUID.fromString(args.getString(0));
+        if (locationsByName.get(uuid) == null) {
+            sender.sendMessageNotExist(uuid.toString(), this.locationNotExists, "location");
+            return;
+        }
 
+        Tuple<String, ExLocation> loc = locationsByName.get(uuid);
+
+        String name = loc.getA();
         if (name.length() >= 13) {
             name = name.substring(0, 13);
         }
 
-        EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc);
+        EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc.getB());
     }
 
     @Override
