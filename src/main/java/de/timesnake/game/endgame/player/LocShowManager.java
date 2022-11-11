@@ -1,5 +1,5 @@
 /*
- * game-endgame.main
+ * timesnake.game-endgame.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@ public class LocShowManager {
             this.trackedLocationByUser.get(user).getB().cancel();
         }
 
-        Sideboard sideboard = EndGameServer.getScoreboardManager().registerNewSideboard("endgameloc", "§6§lLocation");
+        Sideboard sideboard = EndGameServer.getScoreboardManager().registerSideboard("endgameloc", "§6§lLocation");
         sideboard.setScore(6, "§cName: §f" + name);
         sideboard.setScore(5, "-------------------");
         sideboard.setScore(4, "§9X: §f" + location.getBlockX());
