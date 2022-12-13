@@ -1,5 +1,5 @@
 /*
- * game-endgame.main
+ * workspace.game-endgame.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
  * along with this program; If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.timesnake.game.endgame.player;
+package de.timesnake.game.endgame.user;
 
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.chat.Argument;
@@ -86,13 +86,13 @@ public class TriangulationCmd implements CommandListener {
                 return;
             }
 
-            float angle = 180 - firstLocation.getYaw() - firstLocation.getPitch();
-            double locationDistance = Math.abs(firstLocation.clone().add(0, -firstLocation.getY(), 0)
-                    .distance(secondLocation.clone().add(0, -secondLocation.getY(), 0)));
+            Location stronghold = this.calculate(this.firstLocation, this.secondLocation);
 
-            double distanceFromSecond = locationDistance / Math.sin(angle) * Math.sin(firstLocation.getPitch());
+            if (stronghold == null) {
+                sender.sendPluginMessage(Component.text("Unable to calculate position", ExTextColor.WARNING));
+                return;
+            }
 
-            Location stronghold = secondLocation.clone().add(secondLocation.getDirection().normalize().multiply(distanceFromSecond));
             UUID uuid = UUID.randomUUID();
             EndGameServer.getLocShowManager().addLocation(uuid, "stronghold", ExLocation.fromLocation(stronghold));
 
@@ -106,6 +106,45 @@ public class TriangulationCmd implements CommandListener {
             sender.sendMessageCommandHelp(Component.text("Triangulate"), Component.text("tria <1/2/calc>"));
         }
 
+    }
+
+    public Location calculate(Location loc1, Location loc2) {
+        double x1 = loc1.getX();
+        double z1 = loc1.getZ();
+        double x2 = loc2.getX();
+        double z2 = loc2.getZ();
+
+        float a1 = (loc1.getYaw() + 360 + 270) % 180;
+        float a2 = (loc2.getYaw() + 360 + 270) % 180;
+
+        a1 = ((int) (a1 * 1000)) / 1000F;
+        a2 = ((int) (a2 * 1000)) / 1000F;
+
+        // Als Erstes berechnen wir die Steigung der jeweiligen Geraden
+        double s1;
+        double s2;
+        if (a1 == 0.0) { // Undefinierten Fall abfangen, und Flag setzen
+            a1 = 0.001F;
+        }
+        s1 = Math.tan(Math.toRadians(a1));
+
+        if (a2 == 0.0) { // s.o.
+            a2 = 0.001F;
+        }
+        s2 = Math.tan(Math.toRadians(a2));
+
+        // Nun berechnen wir den Schnittpunkt
+        if (s1 == s2) {
+            return null;
+        }
+
+        // Berechne Achsenabschnitt
+        double t1 = z1 - (s1 * x1);
+        double t2 = z2 - (s2 * x2);
+
+        double x = (t2 - t1) / (s1 - s2);
+        double z = s1 * x + t1;
+        return new Location(loc1.getWorld(), x, loc1.getWorld().getHighestBlockYAt((int) x, (int) z), z);
     }
 
     @Override

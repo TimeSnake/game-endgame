@@ -20,18 +20,23 @@ package de.timesnake.game.endgame.server;
 
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.ServerManager;
-import de.timesnake.basic.bukkit.util.group.DisplayGroup;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.user.event.UserDamageByUserEvent;
 import de.timesnake.basic.bukkit.util.user.event.UserJoinEvent;
+import de.timesnake.basic.bukkit.util.user.scoreboard.Sideboard;
 import de.timesnake.basic.bukkit.util.user.scoreboard.Tablist;
-import de.timesnake.basic.bukkit.util.user.scoreboard.TablistBuilder;
+import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
+import de.timesnake.basic.game.util.game.NonTmpGame;
+import de.timesnake.basic.game.util.server.GameServerManager;
+import de.timesnake.basic.game.util.user.SpectatorManager;
 import de.timesnake.channel.util.message.ChannelServerMessage;
 import de.timesnake.channel.util.message.MessageType;
 import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
-import de.timesnake.game.endgame.player.LocShowManager;
+import de.timesnake.game.endgame.user.EndGameUser;
+import de.timesnake.game.endgame.user.LocShowManager;
+import de.timesnake.game.endgame.user.TablistManager;
 import de.timesnake.library.basic.util.Status;
 import de.timesnake.library.basic.util.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Chat;
@@ -41,14 +46,21 @@ import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class EndGameServerManager extends ServerManager implements Listener {
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+public class EndGameServerManager extends GameServerManager<NonTmpGame> implements Listener {
 
     public static EndGameServerManager getInstance() {
         return (EndGameServerManager) ServerManager.getInstance();
@@ -61,21 +73,27 @@ public class EndGameServerManager extends ServerManager implements Listener {
     private ExWorld gameWorldEnd;
 
     private Integer time;
+    private boolean started = false;
+    private final Set<UUID> playingUsers = new HashSet<>();
     private boolean isTimeRunning = false;
     private BukkitTask timeTask;
 
     private EndGameMode mode;
 
-    private Tablist gameTablist;
+    private TablistManager tablistManager;
 
     private boolean reset = false;
 
     private LocShowManager locShowManager;
 
     public void onEndGameEnable() {
-        gameWorld = Server.getWorldManager().createWorld("world");
-        gameWorldNether = Server.getWorldManager().createWorld("world_nether");
-        gameWorldEnd = Server.getWorldManager().createWorld("world_the_end");
+        super.onGameEnable();
+
+        gameWorld = Server.getWorld("world");
+        gameWorldNether = Server.getWorld("world_nether");
+        gameWorldEnd = Server.getWorld("world_the_end");
+
+        this.tablistManager = new TablistManager();
 
         this.setMode(EndGameMode.EASY);
         this.gameWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
@@ -87,37 +105,86 @@ public class EndGameServerManager extends ServerManager implements Listener {
         }
 
         this.locShowManager = new LocShowManager();
-
-        this.gameTablist = Server.getScoreboardManager().registerGroupTablist(new TablistBuilder("endgame")
-                .type(Tablist.Type.HEALTH).groupTypes(DisplayGroup.MAIN_TABLIST_GROUPS));
-        this.gameTablist.setHeader("§5End§6Game \n§7Server: " + Server.getName());
-        this.updateTablistTime();
-        Server.getScoreboardManager().setActiveTablist(this.gameTablist);
+        this.updateTime();
     }
 
     public void onEndGameDisable() {
         this.file.saveTime(this.time);
     }
 
+    @Override
+    public User loadUser(Player player) {
+        return new EndGameUser(player);
+    }
+
+    @Override
+    protected SpectatorManager loadSpectatorManager() {
+        return new SpectatorManager() {
+            @Override
+            public @NotNull Tablist getGameTablist() {
+                return EndGameServerManager.getInstance().getTablistManager().getTablist();
+            }
+
+            @Override
+            public @Nullable Sideboard getGameSideboard() {
+                return null;
+            }
+
+            @Override
+            public @Nullable Sideboard getSpectatorSideboard() {
+                return null;
+            }
+
+            @Override
+            public de.timesnake.basic.bukkit.util.chat.@Nullable Chat getSpectatorChat() {
+                return null;
+            }
+
+            @Override
+            public ExLocation getSpectatorSpawn() {
+                return ExLocation.fromLocation(EndGameServerManager.this.gameWorld.getSpawnLocation());
+            }
+
+            @Override
+            public boolean loadTools() {
+                return true;
+            }
+        };
+    }
+
     @EventHandler
     public void onUserJoin(UserJoinEvent e) {
-        User user = e.getUser();
-        user.sendPluginMessage(Plugin.END_GAME, Component.text("If you or one of your friends die, the whole " + "world will be set back!", ExTextColor.WARNING, TextDecoration.BOLD));
-        user.sendPluginMessage(Plugin.END_GAME, Component.text("To play normal survival-build, " + "please use the survival-server", ExTextColor.PUBLIC));
-        user.getPlayer().setInvulnerable(false);
-        if (!this.isTimeRunning) {
-            user.setGameMode(GameMode.ADVENTURE);
-            user.lockInventory();
-            user.lockLocation(true);
-            user.getPlayer().setInvulnerable(true);
-            user.lockBlocKBreakPlace();
+        EndGameUser user = (EndGameUser) e.getUser();
+        user.sendPluginMessage(Plugin.END_GAME, Component.text("If you or one of your friends die, the whole " +
+                "world will be set back!", ExTextColor.WARNING, TextDecoration.BOLD));
+        user.sendPluginMessage(Plugin.END_GAME, Component.text("To play normal survival-build, " +
+                "please use the survival-server", ExTextColor.PUBLIC));
+
+        if (!this.started || this.playingUsers.contains(user.getUniqueId())) {
+            user.setStatus(Status.User.IN_GAME);
+            if (this.playingUsers.contains(user.getUniqueId()) && this.isTimeRunning) {
+                user.setGameMode(GameMode.SURVIVAL);
+                user.unlockInventory();
+                user.unlockLocation();
+                user.setInvulnerable(false);
+                user.unlockBlockBreakPlace();
+            } else {
+                user.setGameMode(GameMode.ADVENTURE);
+                user.lockInventory();
+                user.lockLocation();
+                user.setInvulnerable(true);
+                user.lockBlocKBreakPlace();
+            }
         } else {
-            user.setGameMode(GameMode.SPECTATOR);
+            user.setStatus(Status.User.SPECTATOR);
+            user.joinSpectator();
         }
     }
 
     public void resetGame() {
         this.pauseGame();
+        this.started = false;
+        this.playingUsers.clear();
         this.isTimeRunning = false;
         if (this.timeTask != null) {
             this.timeTask.cancel();
@@ -154,7 +221,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
             Server.getWorldManager().unloadWorld(gameWorldEnd, false);
 
             this.time = 0;
-            this.updateTablistTime();
+            this.updateTime();
             this.getChannel().sendMessage(new ChannelServerMessage<>(this.getName(), MessageType.Server.KILL_DESTROY, ProcessHandle.current().pid()));
         }, 5 * 20, GameEndGame.getPlugin());
     }
@@ -170,25 +237,20 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
     public void pauseGame() {
         this.broadcastGameMessage(Component.text("Game paused", ExTextColor.PUBLIC));
-        for (User user : Server.getUsers()) {
-            user.setGameMode(GameMode.ADVENTURE);
-            user.lockInventory();
-            user.lockLocation(true);
-            user.getPlayer().setInvulnerable(true);
-        }
+        Server.getUsers().forEach(user -> ((EndGameUser) user).pause());
         this.setTimeRunning(false);
         this.gameWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
     }
 
     public void resumeGame() {
-        this.broadcastGameMessage(Component.text("Game resumed", ExTextColor.PUBLIC));
-        for (User user : Server.getUsers()) {
-            user.setGameMode(GameMode.SURVIVAL);
-            user.unlockInventory();
-            user.unlockBlocKBreakPlace();
-            user.lockLocation(false);
-            user.getPlayer().setInvulnerable(false);
+        if (!this.started) {
+            this.playingUsers.addAll(Server.getUsers().stream().map(User::getUniqueId).toList());
+            Server.getUsers().forEach(u -> u.setStatus(Status.User.IN_GAME));
+            this.started = true;
         }
+
+        this.broadcastGameMessage(Component.text("Game resumed", ExTextColor.PUBLIC));
+        Server.getInGameUsers().forEach(user -> ((EndGameUser) user).resume());
         this.gameWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
         this.setTimeRunning(true);
     }
@@ -207,7 +269,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
                 @Override
                 public void run() {
                     time++;
-                    updateTablistTime();
+                    updateTime();
                 }
             }.runTaskTimerAsynchronously(GameEndGame.getPlugin(), 0, 20);
         } else {
@@ -218,8 +280,8 @@ public class EndGameServerManager extends ServerManager implements Listener {
         }
     }
 
-    private void updateTablistTime() {
-        this.gameTablist.setFooter("§6Time: §9" + Chat.getTimeString(this.time));
+    private void updateTime() {
+        Server.getUsers().forEach(u -> u.sendActionBarText(Component.text(Chat.getTimeString(this.time), ExTextColor.DARK_AQUA)));
     }
 
     @EventHandler
@@ -236,7 +298,7 @@ public class EndGameServerManager extends ServerManager implements Listener {
     }
 
     @EventHandler
-    public void onUserDamageUser(UserDamageByUserEvent e) {
+    public void onUserDamageByUser(UserDamageByUserEvent e) {
         e.setCancelled(true);
     }
 
@@ -277,5 +339,9 @@ public class EndGameServerManager extends ServerManager implements Listener {
 
     public LocShowManager getLocShowManager() {
         return locShowManager;
+    }
+
+    public TablistManager getTablistManager() {
+        return tablistManager;
     }
 }

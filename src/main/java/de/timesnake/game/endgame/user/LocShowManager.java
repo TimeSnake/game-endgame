@@ -1,5 +1,5 @@
 /*
- * timesnake.game-endgame.main
+ * workspace.game-endgame.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
  * along with this program; If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.timesnake.game.endgame.player;
+package de.timesnake.game.endgame.user;
 
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.user.User;
@@ -72,7 +72,7 @@ public class LocShowManager {
 
             String direction = "#";
 
-            if (locVector.length() > 8) {
+            if (locVector.clone().setY(0).length() > 4) {
                 double locAngle = Math.atan2(locVector.getZ(), locVector.getX());
                 double userAngle = Math.atan2(userLoc.getDirection().getZ(), userLoc.getDirection().getX());
 

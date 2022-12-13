@@ -12,6 +12,9 @@ repositories {
 }
 
 dependencies {
+    implementation project(':basic-game')
+    implementation project(':library-game')
+
     compileOnly project(':basic-bukkit')
 
     compileOnly project(':database-bukkit')
@@ -30,8 +33,15 @@ dependencies {
 }
 
 group = project.group
-version = '1.0-SNAPSHOT'
+version = '1.1-SNAPSHOT'
 archivesBaseName = 'game-endgame'
+
+task buildFatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    classifier = "all"
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
 
 task deleteOldPluginJar(type: Delete) {
     delete fileTree(dir: "${project.plugins_dir}", include: "**/${archivesBaseName}-*.jar")
@@ -41,12 +51,11 @@ task deleteOldPluginJar(type: Delete) {
 }
 
 task copyJarToPlugins(type: Copy) {
-    from jar
+    from "build/libs/" + archivesBaseName + "-" + version + "-all" + ".jar"
     into project.plugins_dir
-    onlyIf {
-        !jar.state.upToDate
-    }
 }
 
+jar.finalizedBy(buildFatJar)
+copyJarToPlugins.dependsOn(buildFatJar)
 copyJarToPlugins.dependsOn(deleteOldPluginJar)
 jar.finalizedBy(copyJarToPlugins)
