@@ -1,5 +1,5 @@
 /*
- * game-endgame.main
+ * workspace.game-endgame.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -18,10 +18,11 @@
 
 package de.timesnake.game.endgame.server;
 
-import de.timesnake.basic.bukkit.util.Server;
-import de.timesnake.game.endgame.player.LocShowManager;
+import de.timesnake.basic.game.util.server.GameServer;
+import de.timesnake.game.endgame.user.LocShowManager;
+import de.timesnake.game.endgame.user.TablistManager;
 
-public class EndGameServer extends Server {
+public class EndGameServer extends GameServer {
 
     public static void resetGame() {
         server.resetGame();
@@ -58,6 +59,10 @@ public class EndGameServer extends Server {
 
     public static LocShowManager getLocShowManager() {
         return server.getLocShowManager();
+    }
+
+    public static TablistManager getTablistManager() {
+        return server.getTablistManager();
     }
 
     private static final EndGameServerManager server = EndGameServerManager.getInstance();

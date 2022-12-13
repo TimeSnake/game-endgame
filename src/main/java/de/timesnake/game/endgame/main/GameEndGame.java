@@ -1,5 +1,5 @@
 /*
- * game-endgame.main
+ * workspace.game-endgame.main
  * Copyright (C) 2022 timesnake
  *
  * This program is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@ package de.timesnake.game.endgame.main;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.ServerManager;
 import de.timesnake.game.endgame.chat.Plugin;
-import de.timesnake.game.endgame.player.EndGameCmd;
-import de.timesnake.game.endgame.player.LocCmd;
-import de.timesnake.game.endgame.player.LocShowCmd;
-import de.timesnake.game.endgame.player.TriangulationCmd;
 import de.timesnake.game.endgame.server.EndGameServerManager;
+import de.timesnake.game.endgame.user.EndGameCmd;
+import de.timesnake.game.endgame.user.LocCmd;
+import de.timesnake.game.endgame.user.LocShowCmd;
+import de.timesnake.game.endgame.user.TriangulationCmd;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
