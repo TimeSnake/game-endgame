@@ -15,21 +15,21 @@ import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
+import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Instrument;
 import org.bukkit.Note;
 
-import java.util.List;
-import java.util.UUID;
-
 public class LocCmd implements CommandListener {
 
-    private Code.Permission perm;
+    private Code perm;
 
     @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (!sender.isPlayer(true)) {
             return;
         }
@@ -49,8 +49,11 @@ public class LocCmd implements CommandListener {
 
         Server.broadcastMessage(Server.getChat().getSenderMember(sender.getUser())
                 .append(Component.text(name, ExTextColor.PUBLIC))
-                .append(Component.text(" " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ExTextColor.VALUE))
-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
+                .append(Component.text(
+                        " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(),
+                        ExTextColor.VALUE))
+                .clickEvent(
+                        ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
                 .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
                         Component.text("Click to save the location in the sideboard"))));
         Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
@@ -59,7 +62,8 @@ public class LocCmd implements CommandListener {
     }
 
     @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (args.getLength() == 1) {
             return List.of("lava", "cave", "village", "portal");
         }
@@ -68,6 +72,6 @@ public class LocCmd implements CommandListener {
 
     @Override
     public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("end", "endgame.location");
+        this.perm = plugin.createPermssionCode("endgame.location");
     }
 }

@@ -17,24 +17,24 @@ import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
+import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Location;
 
-import java.util.List;
-import java.util.UUID;
-
 public class TriangulationCmd implements CommandListener {
 
     private Location firstLocation;
     private Location secondLocation;
-    private Code.Permission perm;
-    private Code.Help invalidIndex;
-    private Code.Help tooFewLocations;
+    private Code perm;
+    private Code invalidIndex;
+    private Code tooFewLocations;
 
     @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (!sender.hasPermission(this.perm)) {
             return;
         }
@@ -47,7 +47,6 @@ public class TriangulationCmd implements CommandListener {
             return;
         }
 
-
         User user = sender.getUser();
 
         if (args.get(0).isInt(false)) {
@@ -58,38 +57,50 @@ public class TriangulationCmd implements CommandListener {
             } else if (index == 2) {
                 secondLocation = user.getLocation();
             } else {
-                sender.sendPluginMessage(Component.text("Invalid location index, must be 1 or 2 ", ExTextColor.WARNING)
+                sender.sendPluginMessage(Component.text("Invalid location index, must be 1 or 2 ",
+                                ExTextColor.WARNING)
                         .append(Chat.getMessageCode(this.invalidIndex, ExTextColor.WARNING)));
                 return;
             }
 
-            sender.sendPluginMessage(Component.text("Saved location " + index, ExTextColor.PERSONAL));
+            sender.sendPluginMessage(
+                    Component.text("Saved location " + index, ExTextColor.PERSONAL));
 
         } else if (args.get(0).equalsIgnoreCase("calc", "calculate")) {
             if (firstLocation == null || secondLocation == null) {
-                sender.sendPluginMessage(Component.text("Too few locations set ", ExTextColor.WARNING)
-                        .append(Chat.getMessageCode(this.tooFewLocations, ExTextColor.WARNING)));
+                sender.sendPluginMessage(
+                        Component.text("Too few locations set ", ExTextColor.WARNING)
+                                .append(Chat.getMessageCode(this.tooFewLocations,
+                                        ExTextColor.WARNING)));
                 return;
             }
 
             Location stronghold = this.calculate(this.firstLocation, this.secondLocation);
 
             if (stronghold == null) {
-                sender.sendPluginMessage(Component.text("Unable to calculate position", ExTextColor.WARNING));
+                sender.sendPluginMessage(
+                        Component.text("Unable to calculate position", ExTextColor.WARNING));
                 return;
             }
 
             UUID uuid = UUID.randomUUID();
-            EndGameServer.getLocShowManager().addLocation(uuid, "stronghold", ExLocation.fromLocation(stronghold));
+            EndGameServer.getLocShowManager()
+                    .addLocation(uuid, "stronghold", ExLocation.fromLocation(stronghold));
 
-            Server.broadcastMessage(Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
-                    .append(Component.text("stronghold", ExTextColor.PUBLIC))
-                    .append(Component.text(" " + stronghold.getBlockX() + " " + stronghold.getBlockY() + " " + stronghold.getBlockZ(), ExTextColor.VALUE))
-                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
-                    .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            Component.text("Click to save the location in the sideboard"))));
+            Server.broadcastMessage(
+                    Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
+                            .append(Component.text("stronghold", ExTextColor.PUBLIC))
+                            .append(Component.text(
+                                    " " + stronghold.getBlockX() + " " + stronghold.getBlockY()
+                                            + " " + stronghold.getBlockZ(), ExTextColor.VALUE))
+                            .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/locshow " + uuid))
+                            .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    Component.text(
+                                            "Click to save the location in the sideboard"))));
         } else {
-            sender.sendMessageCommandHelp(Component.text("Triangulate"), Component.text("tria <1/2/calc>"));
+            sender.sendMessageCommandHelp(Component.text("Triangulate"),
+                    Component.text("tria <1/2/calc>"));
         }
 
     }
@@ -130,11 +141,13 @@ public class TriangulationCmd implements CommandListener {
 
         double x = (t2 - t1) / (s1 - s2);
         double z = s1 * x + t1;
-        return new Location(loc1.getWorld(), x, loc1.getWorld().getHighestBlockYAt((int) x, (int) z), z);
+        return new Location(loc1.getWorld(), x,
+                loc1.getWorld().getHighestBlockYAt((int) x, (int) z), z);
     }
 
     @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (args.length() == 1) {
             return List.of("1", "2", "calc", "calculate");
         }
@@ -143,8 +156,8 @@ public class TriangulationCmd implements CommandListener {
 
     @Override
     public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("end", "game.endgame.triangulator");
-        this.invalidIndex = plugin.createHelpCode("end", "Invalid location index, must be 1 or 2");
-        this.tooFewLocations = plugin.createHelpCode("end", "Too few locations");
+        this.perm = plugin.createPermssionCode("game.endgame.triangulator");
+        this.invalidIndex = plugin.createHelpCode("Invalid location index, must be 1 or 2");
+        this.tooFewLocations = plugin.createHelpCode("Too few locations");
     }
 }
