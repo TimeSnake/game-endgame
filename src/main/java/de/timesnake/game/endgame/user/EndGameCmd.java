@@ -15,18 +15,18 @@ import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
-import net.kyori.adventure.text.Component;
-
 import java.util.List;
+import net.kyori.adventure.text.Component;
 
 public class EndGameCmd implements CommandListener {
 
-    private Code.Permission resumePerm;
-    private Code.Permission pausePerm;
-    private Code.Permission resetPerm;
+    private Code resumePerm;
+    private Code pausePerm;
+    private Code resetPerm;
 
     @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
 
         if (!args.isLengthHigherEquals(1, true)) {
             return;
@@ -66,7 +66,8 @@ public class EndGameCmd implements CommandListener {
     }
 
     @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (args.getLength() == 1) {
             return List.of("resume", "pause", "reset", "mode");
         }
@@ -78,9 +79,9 @@ public class EndGameCmd implements CommandListener {
 
     @Override
     public void loadCodes(Plugin plugin) {
-        this.resumePerm = plugin.createPermssionCode("end", "endgame.resume");
-        this.pausePerm = plugin.createPermssionCode("end", "endgame.pause");
-        this.resetPerm = plugin.createPermssionCode("end", "endgame.reset");
+        this.resumePerm = plugin.createPermssionCode("endgame.resume");
+        this.pausePerm = plugin.createPermssionCode("endgame.pause");
+        this.resetPerm = plugin.createPermssionCode("endgame.reset");
     }
 
 }

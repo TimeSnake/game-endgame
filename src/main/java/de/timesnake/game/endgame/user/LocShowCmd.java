@@ -16,19 +16,19 @@ import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
 import de.timesnake.library.extension.util.cmd.ExCommand;
-import net.kyori.adventure.text.Component;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 
 public class LocShowCmd implements CommandListener {
 
-    private Code.Permission perm;
-    private Code.Help locationNotExists;
+    private Code perm;
+    private Code locationNotExists;
 
     @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         if (!sender.isPlayer(true)) {
             return;
         }
@@ -41,11 +41,13 @@ public class LocShowCmd implements CommandListener {
 
         if (!args.isLengthHigherEquals(1, true)) {
             user.resetSideboard();
-            sender.sendMessageCommandHelp(Component.text("Show location"), Component.text("locshow <name>"));
+            sender.sendMessageCommandHelp(Component.text("Show location"),
+                    Component.text("locshow <name>"));
             return;
         }
 
-        HashMap<UUID, Tuple<String, ExLocation>> locationsByName = EndGameServer.getLocShowManager().getLocationsById();
+        HashMap<UUID, Tuple<String, ExLocation>> locationsByName = EndGameServer.getLocShowManager()
+                .getLocationsById();
 
         if (!args.get(0).isUUID(false)) {
             sender.sendPluginMessage(Component.text("Invalid location name ", ExTextColor.WARNING));
@@ -69,13 +71,14 @@ public class LocShowCmd implements CommandListener {
     }
 
     @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd, Arguments<Argument> args) {
+    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+            Arguments<Argument> args) {
         return null;
     }
 
     @Override
     public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("end", "endgame.location");
-        this.locationNotExists = plugin.createHelpCode("end", "Location not exists");
+        this.perm = plugin.createPermssionCode("endgame.location");
+        this.locationNotExists = plugin.createHelpCode("Location not exists");
     }
 }
