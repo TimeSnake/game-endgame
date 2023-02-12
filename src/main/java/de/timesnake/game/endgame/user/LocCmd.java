@@ -10,7 +10,7 @@ import de.timesnake.basic.bukkit.util.chat.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.Sender;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.server.EndGameServer;
-import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Code;
 import de.timesnake.library.extension.util.chat.Plugin;
 import de.timesnake.library.extension.util.cmd.Arguments;
@@ -39,7 +39,7 @@ public class LocCmd implements CommandListener {
         }
 
         if (!args.isLengthHigherEquals(1, true)) {
-            sender.sendMessageCommandHelp("Send location", "loc <name>");
+            sender.sendTDMessageCommandHelp("Send location", "loc <name>");
             return;
         }
 

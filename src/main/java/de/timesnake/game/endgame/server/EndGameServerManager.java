@@ -24,7 +24,7 @@ import de.timesnake.game.endgame.user.EndGameUser;
 import de.timesnake.game.endgame.user.LocShowManager;
 import de.timesnake.game.endgame.user.TablistManager;
 import de.timesnake.library.basic.util.Status;
-import de.timesnake.library.basic.util.chat.ExTextColor;
+import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Chat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
