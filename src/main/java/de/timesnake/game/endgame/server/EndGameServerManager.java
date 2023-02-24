@@ -26,6 +26,9 @@ import de.timesnake.game.endgame.user.TablistManager;
 import de.timesnake.library.basic.util.Status;
 import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.extension.util.chat.Chat;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Chunk;
@@ -39,12 +42,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public class EndGameServerManager extends GameServerManager<NonTmpGame> implements Listener {
 
@@ -104,17 +102,18 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     }
 
     @Override
+    public Sideboard getGameSideboard() {
+        return null;
+    }
+
+    @Override
+    public Tablist getGameTablist() {
+        return EndGameServerManager.getInstance().getTablistManager().getTablist();
+    }
+
+    @Override
     protected SpectatorManager loadSpectatorManager() {
         return new SpectatorManager() {
-            @Override
-            public @NotNull Tablist getGameTablist() {
-                return EndGameServerManager.getInstance().getTablistManager().getTablist();
-            }
-
-            @Override
-            public @Nullable Sideboard getGameSideboard() {
-                return null;
-            }
 
             @Override
             public @Nullable Sideboard getSpectatorSideboard() {
@@ -128,7 +127,8 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
             @Override
             public ExLocation getSpectatorSpawn() {
-                return ExLocation.fromLocation(EndGameServerManager.this.gameWorld.getSpawnLocation());
+                return ExLocation.fromLocation(
+                        EndGameServerManager.this.gameWorld.getSpawnLocation());
             }
 
             @Override
@@ -141,8 +141,9 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     @EventHandler
     public void onUserJoin(UserJoinEvent e) {
         EndGameUser user = (EndGameUser) e.getUser();
-        user.sendPluginMessage(Plugin.END_GAME, Component.text("If you or one of your friends die, the whole " +
-                "world will be set back!", ExTextColor.WARNING, TextDecoration.BOLD));
+        user.sendPluginMessage(Plugin.END_GAME,
+                Component.text("If you or one of your friends die, the whole " +
+                        "world will be set back!", ExTextColor.WARNING, TextDecoration.BOLD));
         user.sendPluginMessage(Plugin.END_GAME, Component.text("To play normal survival-build, " +
                 "please use the survival-server", ExTextColor.PUBLIC));
 
@@ -177,7 +178,8 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
         }
 
         this.locShowManager.reset();
-        Server.broadcastMessage(Plugin.END_GAME, Component.text("Starting world reset", ExTextColor.WARNING));
+        Server.broadcastMessage(Plugin.END_GAME,
+                Component.text("Starting world reset", ExTextColor.WARNING));
         for (User user : Server.getUsers()) {
             user.resetSideboard();
             user.switchToLobbyLast();
@@ -208,7 +210,9 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
             this.time = 0;
             this.updateTime();
-            this.getChannel().sendMessage(new ChannelServerMessage<>(this.getName(), MessageType.Server.KILL_DESTROY, ProcessHandle.current().pid()));
+            this.getChannel().sendMessage(
+                    new ChannelServerMessage<>(this.getName(), MessageType.Server.KILL_DESTROY,
+                            ProcessHandle.current().pid()));
         }, 5 * 20, GameEndGame.getPlugin());
     }
 
@@ -267,19 +271,23 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     }
 
     private void updateTime() {
-        Server.getUsers().forEach(u -> u.sendActionBarText(Component.text(Chat.getTimeString(this.time), ExTextColor.DARK_AQUA)));
+        Server.getUsers().forEach(u -> u.sendActionBarText(
+                Component.text(Chat.getTimeString(this.time), ExTextColor.DARK_AQUA)));
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         e.deathMessage(Component.empty());
         User user = Server.getUser(e.getEntity());
-        Server.broadcastMessage(Plugin.END_GAME, user.getChatNameComponent().append(Component.text(" died!", ExTextColor.WARNING)));
+        Server.broadcastMessage(Plugin.END_GAME,
+                user.getChatNameComponent().append(Component.text(" died!", ExTextColor.WARNING)));
         this.broadcastGameMessage(Component.text("Game stopped", ExTextColor.WARNING));
         this.setTimeRunning(false);
         for (User u : Server.getUsers()) {
             u.setGameMode(GameMode.SPECTATOR);
-            u.asSender(Plugin.END_GAME).sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL), Component.text("eg reset", ExTextColor.VALUE));
+            u.asSender(Plugin.END_GAME)
+                    .sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL),
+                            Component.text("eg reset", ExTextColor.VALUE));
         }
     }
 
@@ -292,7 +300,10 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     public void onEntityDeath(EntityDeathEvent e) {
         if (e.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
             this.setTimeRunning(false);
-            this.broadcastGameMessage(Component.text("You defeated Minecraft in ", ExTextColor.WARNING).append(Component.text(Chat.getTimeString(this.time), ExTextColor.VALUE)));
+            this.broadcastGameMessage(
+                    Component.text("You defeated Minecraft in ", ExTextColor.WARNING)
+                            .append(Component.text(Chat.getTimeString(this.time),
+                                    ExTextColor.VALUE)));
         }
     }
 
@@ -308,7 +319,8 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     public void setMode(EndGameMode mode) {
         this.mode = mode;
 
-        this.broadcastGameMessage(Component.text("Difficulty: ", ExTextColor.WARNING).append(Component.text(mode.getName().replace("_", " "), ExTextColor.VALUE)));
+        this.broadcastGameMessage(Component.text("Difficulty: ", ExTextColor.WARNING)
+                .append(Component.text(mode.getName().replace("_", " "), ExTextColor.VALUE)));
 
         this.gameWorld.setDifficulty(mode.getDifficulty());
         this.gameWorldNether.setDifficulty(mode.getDifficulty());
