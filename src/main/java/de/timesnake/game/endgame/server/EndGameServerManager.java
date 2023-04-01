@@ -112,7 +112,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     }
 
     @Override
-    protected SpectatorManager loadSpectatorManager() {
+    protected SpectatorManager initSpectatorManager() {
         return new SpectatorManager() {
 
             @Override
