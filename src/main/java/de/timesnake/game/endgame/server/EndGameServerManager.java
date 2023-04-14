@@ -40,7 +40,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,6 +89,8 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
         this.locShowManager = new LocShowManager();
         this.updateTime();
+
+        Server.getWorldManager().setCacheWorldSpawns(true);
     }
 
     public void onEndGameDisable() {
@@ -255,18 +256,17 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
             if (this.timeTask != null) {
                 this.timeTask.cancel();
             }
-            this.timeTask = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    time++;
-                    updateTime();
-                }
-            }.runTaskTimerAsynchronously(GameEndGame.getPlugin(), 0, 20);
+            this.timeTask = Server.runTaskTimerAsynchrony(() -> {
+                time++;
+                updateTime();
+            }, 0, 20, GameEndGame.getPlugin());
         } else {
             this.isTimeRunning = false;
             if (this.timeTask != null) {
                 this.timeTask.cancel();
             }
+            this.timeTask = Server.runTaskTimerAsynchrony(this::updateTime, 0, 20,
+                    GameEndGame.getPlugin());
         }
     }
 
@@ -277,18 +277,22 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        e.deathMessage(Component.empty());
         User user = Server.getUser(e.getEntity());
-        Server.broadcastMessage(Plugin.END_GAME,
-                user.getChatNameComponent().append(Component.text(" died!", ExTextColor.WARNING)));
-        this.broadcastGameMessage(Component.text("Game stopped", ExTextColor.WARNING));
-        this.setTimeRunning(false);
-        for (User u : Server.getUsers()) {
-            u.setGameMode(GameMode.SPECTATOR);
-            u.asSender(Plugin.END_GAME)
-                    .sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL),
-                            Component.text("eg reset", ExTextColor.VALUE));
-        }
+
+        Server.runTaskLaterSynchrony(() -> {
+            Server.broadcastMessage(Plugin.END_GAME,
+                    user.getChatNameComponent()
+                            .append(Component.text(" died!", ExTextColor.WARNING)));
+            this.broadcastGameMessage(Component.text("Game stopped", ExTextColor.WARNING));
+            this.setTimeRunning(false);
+            for (User u : Server.getUsers()) {
+                u.setGameMode(GameMode.SPECTATOR);
+                u.asSender(Plugin.END_GAME)
+                        .sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL),
+                                Component.text("eg reset", ExTextColor.VALUE));
+            }
+        }, 1, GameEndGame.getPlugin());
+
     }
 
     @EventHandler
