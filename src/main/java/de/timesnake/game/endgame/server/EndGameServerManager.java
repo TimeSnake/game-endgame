@@ -30,16 +30,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,6 +61,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
     private Integer time;
     private boolean started = false;
+    private boolean netherPortalLocated = false;
     private final Set<UUID> playingUsers = new HashSet<>();
     private boolean isTimeRunning = false;
     private BukkitTask timeTask;
@@ -308,6 +313,39 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
                     Component.text("You defeated Minecraft in ", ExTextColor.WARNING)
                             .append(Component.text(Chat.getTimeString(this.time),
                                     ExTextColor.VALUE)));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent e) {
+        EndGameUser user = ((EndGameUser) Server.getUser(e.getPlayer()));
+
+        if (this.netherPortalLocated) {
+            return;
+        }
+
+        if (this.playingUsers.contains(user.getUniqueId())) {
+            if (user.getExWorld().equals(this.gameWorldNether)) {
+                Location loc = user.getLocation();
+
+                UUID uuid = UUID.randomUUID();
+                EndGameServer.getLocShowManager()
+                        .addLocation(uuid, "nether portal", ExLocation.fromLocation(loc));
+
+                this.netherPortalLocated = true;
+
+                Server.broadcastMessage(
+                        Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
+                                .append(Component.text("nether portal", ExTextColor.PUBLIC))
+                                .append(Component.text(
+                                        " " + loc.getBlockX() + " " + loc.getBlockY()
+                                                + " " + loc.getBlockZ(), ExTextColor.VALUE))
+                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                                        "/locshow " + uuid))
+                                .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                        Component.text(
+                                                "Click to save location in sideboard"))));
+            }
         }
     }
 

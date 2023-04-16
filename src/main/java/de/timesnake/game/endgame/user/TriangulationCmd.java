@@ -97,7 +97,7 @@ public class TriangulationCmd implements CommandListener {
                                     "/locshow " + uuid))
                             .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
                                     Component.text(
-                                            "Click to save the location in the sideboard"))));
+                                            "Click to save location in sideboard"))));
         } else {
             sender.sendMessageCommandHelp(Component.text("Triangulate"),
                     Component.text("tria <1/2/calc>"));

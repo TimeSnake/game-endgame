@@ -55,7 +55,7 @@ public class LocCmd implements CommandListener {
                 .clickEvent(
                         ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
                 .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        Component.text("Click to save the location in the sideboard"))));
+                        Component.text("Click to save location in sideboard"))));
         Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
 
         EndGameServer.getLocShowManager().addLocation(uuid, name, loc.getExBlock().getLocation());
