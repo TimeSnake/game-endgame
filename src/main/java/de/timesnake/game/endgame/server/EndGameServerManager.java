@@ -166,7 +166,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
                 user.lockInventory();
                 user.lockLocation();
                 user.setInvulnerable(true);
-                user.lockBlocKBreakPlace();
+                user.lockBlockBreakPlace();
             }
         } else {
             user.setStatus(Status.User.SPECTATOR);
