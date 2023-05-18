@@ -23,62 +23,62 @@ import net.kyori.adventure.text.Component;
 
 public class LocShowCmd implements CommandListener {
 
-    private Code perm;
-    private Code locationNotExists;
+  private Code perm;
+  private Code locationNotExists;
 
-    @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
-            Arguments<Argument> args) {
-        if (!sender.isPlayer(true)) {
-            return;
-        }
-
-        if (!sender.hasPermission(this.perm)) {
-            return;
-        }
-
-        User user = sender.getUser();
-
-        if (!args.isLengthHigherEquals(1, true)) {
-            user.resetSideboard();
-            sender.sendMessageCommandHelp(Component.text("Show location"),
-                    Component.text("locshow <name>"));
-            return;
-        }
-
-        HashMap<UUID, Tuple<String, ExLocation>> locationsByName = EndGameServer.getLocShowManager()
-                .getLocationsById();
-
-        if (!args.get(0).isUUID(false)) {
-            sender.sendPluginMessage(Component.text("Invalid location name ", ExTextColor.WARNING));
-            return;
-        }
-
-        UUID uuid = UUID.fromString(args.getString(0));
-        if (locationsByName.get(uuid) == null) {
-            sender.sendMessageNotExist(uuid.toString(), this.locationNotExists, "location");
-            return;
-        }
-
-        Tuple<String, ExLocation> loc = locationsByName.get(uuid);
-
-        String name = loc.getA();
-        if (name.length() >= 13) {
-            name = name.substring(0, 13);
-        }
-
-        EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc.getB());
+  @Override
+  public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+      Arguments<Argument> args) {
+    if (!sender.isPlayer(true)) {
+      return;
     }
 
-    @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
-            Arguments<Argument> args) {
-        return null;
+    if (!sender.hasPermission(this.perm)) {
+      return;
     }
 
-    @Override
-    public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("endgame.location");
-        this.locationNotExists = plugin.createHelpCode("Location not exists");
+    User user = sender.getUser();
+
+    if (!args.isLengthHigherEquals(1, true)) {
+      user.resetSideboard();
+      sender.sendMessageCommandHelp(Component.text("Show location"),
+          Component.text("locshow <name>"));
+      return;
     }
+
+    HashMap<UUID, Tuple<String, ExLocation>> locationsByName = EndGameServer.getLocShowManager()
+        .getLocationsById();
+
+    if (!args.get(0).isUUID(false)) {
+      sender.sendPluginMessage(Component.text("Invalid location name ", ExTextColor.WARNING));
+      return;
+    }
+
+    UUID uuid = UUID.fromString(args.getString(0));
+    if (locationsByName.get(uuid) == null) {
+      sender.sendMessageNotExist(uuid.toString(), this.locationNotExists, "location");
+      return;
+    }
+
+    Tuple<String, ExLocation> loc = locationsByName.get(uuid);
+
+    String name = loc.getA();
+    if (name.length() >= 13) {
+      name = name.substring(0, 13);
+    }
+
+    EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc.getB());
+  }
+
+  @Override
+  public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+      Arguments<Argument> args) {
+    return null;
+  }
+
+  @Override
+  public void loadCodes(Plugin plugin) {
+    this.perm = plugin.createPermssionCode("endgame.location");
+    this.locationNotExists = plugin.createHelpCode("Location not exists");
+  }
 }

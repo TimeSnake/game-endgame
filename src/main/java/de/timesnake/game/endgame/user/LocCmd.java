@@ -25,53 +25,53 @@ import org.bukkit.Note;
 
 public class LocCmd implements CommandListener {
 
-    private Code perm;
+  private Code perm;
 
-    @Override
-    public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
-            Arguments<Argument> args) {
-        if (!sender.isPlayer(true)) {
-            return;
-        }
-
-        if (!sender.hasPermission(this.perm)) {
-            return;
-        }
-
-        if (!args.isLengthHigherEquals(1, true)) {
-            sender.sendTDMessageCommandHelp("Send location", "loc <name>");
-            return;
-        }
-
-        ExLocation loc = sender.getUser().getExLocation();
-        String name = args.toMessage();
-        UUID uuid = UUID.randomUUID();
-
-        Server.broadcastMessage(Server.getChat().getSenderMember(sender.getUser())
-                .append(Component.text(name, ExTextColor.PUBLIC))
-                .append(Component.text(
-                        " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(),
-                        ExTextColor.VALUE))
-                .clickEvent(
-                        ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
-                .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        Component.text("Click to save location in sideboard"))));
-        Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
-
-        EndGameServer.getLocShowManager().addLocation(uuid, name, loc.getExBlock().getLocation());
+  @Override
+  public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+      Arguments<Argument> args) {
+    if (!sender.isPlayer(true)) {
+      return;
     }
 
-    @Override
-    public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
-            Arguments<Argument> args) {
-        if (args.getLength() == 1) {
-            return List.of("lava", "cave", "village", "portal");
-        }
-        return List.of();
+    if (!sender.hasPermission(this.perm)) {
+      return;
     }
 
-    @Override
-    public void loadCodes(Plugin plugin) {
-        this.perm = plugin.createPermssionCode("endgame.location");
+    if (!args.isLengthHigherEquals(1, true)) {
+      sender.sendTDMessageCommandHelp("Send location", "loc <name>");
+      return;
     }
+
+    ExLocation loc = sender.getUser().getExLocation();
+    String name = args.toMessage();
+    UUID uuid = UUID.randomUUID();
+
+    Server.broadcastMessage(Server.getChat().getSenderMember(sender.getUser())
+        .append(Component.text(name, ExTextColor.PUBLIC))
+        .append(Component.text(
+            " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(),
+            ExTextColor.VALUE))
+        .clickEvent(
+            ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/locshow " + uuid))
+        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
+            Component.text("Click to save location in sideboard"))));
+    Server.broadcastNote(Instrument.PLING, Note.natural(1, Note.Tone.C));
+
+    EndGameServer.getLocShowManager().addLocation(uuid, name, loc.getExBlock().getLocation());
+  }
+
+  @Override
+  public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
+      Arguments<Argument> args) {
+    if (args.getLength() == 1) {
+      return List.of("lava", "cave", "village", "portal");
+    }
+    return List.of();
+  }
+
+  @Override
+  public void loadCodes(Plugin plugin) {
+    this.perm = plugin.createPermssionCode("endgame.location");
+  }
 }
