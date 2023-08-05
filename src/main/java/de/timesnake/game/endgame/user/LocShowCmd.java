@@ -67,6 +67,10 @@ public class LocShowCmd implements CommandListener {
       name = name.substring(0, 13);
     }
 
+    if (EndGameServer.isEnded() || !EndGameServer.getPlayingUsers().contains(user.getUniqueId())) {
+      user.teleport(loc.getB());
+    }
+
     EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc.getB());
   }
 
