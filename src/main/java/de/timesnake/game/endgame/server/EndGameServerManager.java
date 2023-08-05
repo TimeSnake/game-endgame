@@ -61,6 +61,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
   private Integer time;
   private boolean started = false;
+  private boolean ended = false;
   private boolean netherPortalLocated = false;
   private final Set<UUID> playingUsers = new HashSet<>();
   private boolean isTimeRunning = false;
@@ -282,14 +283,10 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
 
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent e) {
-    User user = Server.getUser(e.getEntity());
-
     Server.runTaskLaterSynchrony(() -> {
-      Server.broadcastMessage(Plugin.END_GAME,
-          user.getChatNameComponent()
-              .append(Component.text(" died!", ExTextColor.WARNING)));
       this.broadcastGameMessage(Component.text("Game stopped", ExTextColor.WARNING));
       this.setTimeRunning(false);
+      this.ended = true;
       for (User u : Server.getUsers()) {
         u.setGameMode(GameMode.SPECTATOR);
         u.asSender(Plugin.END_GAME)
@@ -309,6 +306,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
   public void onEntityDeath(EntityDeathEvent e) {
     if (e.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
       this.setTimeRunning(false);
+      this.ended = true;
       this.broadcastGameMessage(
           Component.text("You defeated Minecraft in ", ExTextColor.WARNING)
               .append(Component.text(Chat.getTimeString(this.time),
@@ -353,6 +351,17 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     return this.reset;
   }
 
+  public boolean isStarted() {
+    return started;
+  }
+
+  public boolean isEnded() {
+    return ended;
+  }
+
+  public Set<UUID> getPlayingUsers() {
+    return playingUsers;
+  }
 
   public EndGameMode getMode() {
     return mode;

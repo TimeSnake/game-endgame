@@ -8,6 +8,9 @@ import de.timesnake.basic.game.util.server.GameServer;
 import de.timesnake.game.endgame.user.LocShowManager;
 import de.timesnake.game.endgame.user.TablistManager;
 
+import java.util.Collection;
+import java.util.UUID;
+
 public class EndGameServer extends GameServer {
 
   public static void resetGame() {
@@ -49,6 +52,18 @@ public class EndGameServer extends GameServer {
 
   public static TablistManager getTablistManager() {
     return server.getTablistManager();
+  }
+
+  public static boolean isStarted() {
+    return server.isStarted();
+  }
+
+  public static boolean isEnded() {
+    return server.isEnded();
+  }
+
+  public static Collection<UUID> getPlayingUsers() {
+    return server.getPlayingUsers();
   }
 
   private static final EndGameServerManager server = EndGameServerManager.getInstance();
