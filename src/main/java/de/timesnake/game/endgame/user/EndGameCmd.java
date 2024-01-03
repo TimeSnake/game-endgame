@@ -4,28 +4,30 @@
 
 package de.timesnake.game.endgame.user;
 
-import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.CommandListener;
-import de.timesnake.basic.bukkit.util.chat.Sender;
+import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
+import de.timesnake.basic.bukkit.util.chat.cmd.CommandListener;
+import de.timesnake.basic.bukkit.util.chat.cmd.Completion;
+import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
+import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameMode;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.game.endgame.server.EndGameServerManager;
 import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.commands.PluginCommand;
+import de.timesnake.library.commands.simple.Arguments;
 import de.timesnake.library.extension.util.chat.Code;
-import de.timesnake.library.extension.util.chat.Plugin;
-import de.timesnake.library.extension.util.cmd.Arguments;
-import de.timesnake.library.extension.util.cmd.ExCommand;
-import java.util.List;
 import net.kyori.adventure.text.Component;
 
 public class EndGameCmd implements CommandListener {
 
-  private Code resumePerm;
-  private Code pausePerm;
-  private Code resetPerm;
+  private final Code perm = Plugin.END_GAME.createPermssionCode("endgame");
+  private final Code resumePerm = Plugin.END_GAME.createPermssionCode("endgame.resume");
+  private final Code pausePerm = Plugin.END_GAME.createPermssionCode("endgame.pause");
+  private final Code resetPerm = Plugin.END_GAME.createPermssionCode("endgame.reset");
+  private final Code modePerm = Plugin.END_GAME.createPermssionCode("endgame.mode");
 
   @Override
-  public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
+  public void onCommand(Sender sender, PluginCommand cmd,
       Arguments<Argument> args) {
 
     if (!args.isLengthHigherEquals(1, true)) {
@@ -53,6 +55,8 @@ public class EndGameCmd implements CommandListener {
         EndGameServerManager.getInstance().resetGame();
       }
     } else if (args.get(0).equalsIgnoreCase("mode")) {
+      sender.hasPermissionElseExit(this.modePerm);
+
       if (!args.isLengthEquals(2, true)) {
         return;
       }
@@ -66,22 +70,17 @@ public class EndGameCmd implements CommandListener {
   }
 
   @Override
-  public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
-      Arguments<Argument> args) {
-    if (args.getLength() == 1) {
-      return List.of("resume", "pause", "reset", "mode");
-    }
-    if (args.getLength() == 2 && args.get(0).equalsIgnoreCase("mode")) {
-      return EndGameMode.getNames();
-    }
-    return List.of();
+  public Completion getTabCompletion() {
+    return new Completion()
+        .addArgument(new Completion(this.resumePerm, "resume"))
+        .addArgument(new Completion(this.pausePerm, "pause"))
+        .addArgument(new Completion(this.resetPerm, "reset"))
+        .addArgument(new Completion(this.modePerm, "mode")
+            .addArgument(new Completion(EndGameMode.getNames())));
   }
 
   @Override
-  public void loadCodes(Plugin plugin) {
-    this.resumePerm = plugin.createPermssionCode("endgame.resume");
-    this.pausePerm = plugin.createPermssionCode("endgame.pause");
-    this.resetPerm = plugin.createPermssionCode("endgame.reset");
+  public String getPermission() {
+    return this.perm.getPermission();
   }
-
 }
