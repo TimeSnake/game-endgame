@@ -5,36 +5,37 @@
 package de.timesnake.game.endgame.user;
 
 import de.timesnake.basic.bukkit.util.Server;
-import de.timesnake.basic.bukkit.util.chat.Argument;
-import de.timesnake.basic.bukkit.util.chat.CommandListener;
-import de.timesnake.basic.bukkit.util.chat.Sender;
+import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
+import de.timesnake.basic.bukkit.util.chat.cmd.CommandListener;
+import de.timesnake.basic.bukkit.util.chat.cmd.Completion;
+import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
+import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.commands.PluginCommand;
+import de.timesnake.library.commands.simple.Arguments;
 import de.timesnake.library.extension.util.chat.Chat;
 import de.timesnake.library.extension.util.chat.Code;
-import de.timesnake.library.extension.util.chat.Plugin;
-import de.timesnake.library.extension.util.cmd.Arguments;
-import de.timesnake.library.extension.util.cmd.ExCommand;
-import java.util.List;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Location;
 
+import java.util.UUID;
+
 public class TriangulationCmd implements CommandListener {
 
   private Location firstLocation;
   private Location secondLocation;
-  private Code perm;
-  private Code invalidIndex;
-  private Code tooFewLocations;
+
+  private final Code perm = Plugin.END_GAME.createPermssionCode("game.endgame.triangulator");
+  private final Code invalidIndex = Plugin.END_GAME.createHelpCode("Invalid location index, must be 1 or 2");
+  private final Code tooFewLocations = Plugin.END_GAME.createHelpCode("Too few locations");
 
   @Override
-  public void onCommand(Sender sender, ExCommand<Sender, Argument> cmd,
-      Arguments<Argument> args) {
+  public void onCommand(Sender sender, PluginCommand cmd, Arguments<Argument> args) {
     if (!sender.hasPermission(this.perm)) {
       return;
     }
@@ -146,18 +147,13 @@ public class TriangulationCmd implements CommandListener {
   }
 
   @Override
-  public List<String> getTabCompletion(ExCommand<Sender, Argument> cmd,
-      Arguments<Argument> args) {
-    if (args.length() == 1) {
-      return List.of("1", "2", "calc", "calculate");
-    }
-    return List.of();
+  public Completion getTabCompletion() {
+    return new Completion(this.perm)
+        .addArgument(new Completion("1", "2", "calc", "calculate"));
   }
 
   @Override
-  public void loadCodes(Plugin plugin) {
-    this.perm = plugin.createPermssionCode("game.endgame.triangulator");
-    this.invalidIndex = plugin.createHelpCode("Invalid location index, must be 1 or 2");
-    this.tooFewLocations = plugin.createHelpCode("Too few locations");
+  public String getPermission() {
+    return this.perm.getPermission();
   }
 }
