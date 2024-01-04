@@ -12,10 +12,10 @@ import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameMode;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.game.endgame.server.EndGameServerManager;
+import de.timesnake.library.chat.Code;
 import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.commands.PluginCommand;
 import de.timesnake.library.commands.simple.Arguments;
-import de.timesnake.library.extension.util.chat.Code;
 import net.kyori.adventure.text.Component;
 
 public class EndGameCmd implements CommandListener {

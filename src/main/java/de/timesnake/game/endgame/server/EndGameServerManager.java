@@ -24,11 +24,8 @@ import de.timesnake.game.endgame.user.EndGameUser;
 import de.timesnake.game.endgame.user.LocShowManager;
 import de.timesnake.game.endgame.user.TablistManager;
 import de.timesnake.library.basic.util.Status;
+import de.timesnake.library.chat.Chat;
 import de.timesnake.library.chat.ExTextColor;
-import de.timesnake.library.extension.util.chat.Chat;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -46,6 +43,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class EndGameServerManager extends GameServerManager<NonTmpGame> implements Listener {
 
