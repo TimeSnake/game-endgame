@@ -12,11 +12,12 @@ import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.main.GameEndGame;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.basic.util.Tuple;
-import java.util.HashMap;
-import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 public class LocShowManager {
 
@@ -63,8 +64,7 @@ public class LocShowManager {
 
       if (locVector.clone().setY(0).length() > 4) {
         double locAngle = Math.atan2(locVector.getZ(), locVector.getX());
-        double userAngle = Math.atan2(userLoc.getDirection().getZ(),
-            userLoc.getDirection().getX());
+        double userAngle = Math.atan2(userLoc.getDirection().getZ(), userLoc.getDirection().getX());
 
         double angle = userAngle - locAngle;
 
