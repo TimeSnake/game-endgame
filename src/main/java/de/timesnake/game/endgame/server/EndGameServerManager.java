@@ -4,13 +4,13 @@
 
 package de.timesnake.game.endgame.server;
 
+import de.timesnake.basic.bukkit.core.user.scoreboard.tablist.Tablist2;
 import de.timesnake.basic.bukkit.util.Server;
 import de.timesnake.basic.bukkit.util.ServerManager;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.user.event.UserDamageByUserEvent;
 import de.timesnake.basic.bukkit.util.user.event.UserJoinEvent;
 import de.timesnake.basic.bukkit.util.user.scoreboard.Sideboard;
-import de.timesnake.basic.bukkit.util.user.scoreboard.Tablist;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.basic.bukkit.util.world.ExWorld;
 import de.timesnake.basic.game.util.game.NonTmpGame;
@@ -42,6 +42,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -115,7 +116,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
   }
 
   @Override
-  public Tablist getGameTablist() {
+  public Tablist2 getGameTablist() {
     return EndGameServerManager.getInstance().getTablistManager().getTablist();
   }
 
@@ -134,7 +135,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
       }
 
       @Override
-      public ExLocation getSpectatorSpawn() {
+      public @NotNull ExLocation getSpectatorSpawn() {
         return ExLocation.fromLocation(
             EndGameServerManager.this.gameWorld.getSpawnLocation());
       }
