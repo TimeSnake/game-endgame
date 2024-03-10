@@ -13,14 +13,11 @@ import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.basic.util.Tuple;
-import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.chat.Code;
 import de.timesnake.library.commands.PluginCommand;
 import de.timesnake.library.commands.simple.Arguments;
-import de.timesnake.library.chat.Code;
-import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 public class LocShowCmd implements CommandListener {
 
@@ -41,26 +38,20 @@ public class LocShowCmd implements CommandListener {
 
     if (!args.isLengthHigherEquals(1, true)) {
       user.resetSideboard();
-      sender.sendMessageCommandHelp(Component.text("Show location"),
-          Component.text("locshow <name>"));
+      sender.sendTDMessageCommandHelp("Show location", "locshow <name>");
       return;
     }
 
-    HashMap<UUID, Tuple<String, ExLocation>> locationsByName = EndGameServer.getLocShowManager()
+    HashMap<Integer, Tuple<String, ExLocation>> locationsById = EndGameServer.getLocShowManager()
         .getLocationsById();
 
-    if (!args.get(0).isUUID(false)) {
-      sender.sendPluginMessage(Component.text("Invalid location name ", ExTextColor.WARNING));
+    Integer id = args.get(0).toIntOrExit(false);
+    if (locationsById.get(id) == null) {
+      sender.sendMessageNotExist(id.toString(), this.locationNotExists, "location");
       return;
     }
 
-    UUID uuid = UUID.fromString(args.getString(0));
-    if (locationsByName.get(uuid) == null) {
-      sender.sendMessageNotExist(uuid.toString(), this.locationNotExists, "location");
-      return;
-    }
-
-    Tuple<String, ExLocation> loc = locationsByName.get(uuid);
+    Tuple<String, ExLocation> loc = locationsById.get(id);
 
     String name = loc.getA();
     if (name.length() >= 13) {
@@ -71,7 +62,7 @@ public class LocShowCmd implements CommandListener {
       user.teleport(loc.getB());
     }
 
-    EndGameServer.getLocShowManager().setTrackedLocation(user, name, loc.getB());
+    EndGameServer.getLocShowManager().setTrackedLocation(user, id, name, loc.getB());
   }
 
   @Override

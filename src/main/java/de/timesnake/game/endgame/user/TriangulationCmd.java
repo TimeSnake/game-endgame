@@ -13,17 +13,15 @@ import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
 import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameServer;
+import de.timesnake.library.chat.Chat;
+import de.timesnake.library.chat.Code;
 import de.timesnake.library.chat.ExTextColor;
 import de.timesnake.library.commands.PluginCommand;
 import de.timesnake.library.commands.simple.Arguments;
-import de.timesnake.library.chat.Chat;
-import de.timesnake.library.chat.Code;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Location;
-
-import java.util.UUID;
 
 public class TriangulationCmd implements CommandListener {
 
@@ -84,9 +82,7 @@ public class TriangulationCmd implements CommandListener {
         return;
       }
 
-      UUID uuid = UUID.randomUUID();
-      EndGameServer.getLocShowManager()
-          .addLocation(uuid, "stronghold", ExLocation.fromLocation(stronghold));
+      int id = EndGameServer.getLocShowManager().addLocation("stronghold", ExLocation.fromLocation(stronghold));
 
       Server.broadcastMessage(
           Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
@@ -95,13 +91,12 @@ public class TriangulationCmd implements CommandListener {
                   " " + stronghold.getBlockX() + " " + stronghold.getBlockY()
                       + " " + stronghold.getBlockZ(), ExTextColor.VALUE))
               .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
-                  "/locshow " + uuid))
+                  "/locshow " + id))
               .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
                   Component.text(
                       "Click to save location in sideboard"))));
     } else {
-      sender.sendMessageCommandHelp(Component.text("Triangulate"),
-          Component.text("tria <1/2/calc>"));
+      sender.sendTDMessageCommandHelp("Triangulate", "tria <1/2/calc>");
     }
 
   }
