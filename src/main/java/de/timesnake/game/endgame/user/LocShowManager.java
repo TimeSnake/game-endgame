@@ -17,30 +17,31 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 public class LocShowManager {
 
-
-  private final HashMap<UUID, Tuple<String, ExLocation>> locationsById = new HashMap<>();
+  private int idCounter = 0;
+  private final HashMap<Integer, Tuple<String, ExLocation>> locationsById = new HashMap<>();
   private final HashMap<User, Tuple<ExLocation, BukkitTask>> trackedLocationByUser = new HashMap<>();
 
-  public void addLocation(UUID uuid, String name, ExLocation loc) {
-    this.locationsById.put(uuid, new Tuple<>(name, loc));
+  public int addLocation(String name, ExLocation loc) {
+    int id = idCounter++;
+    this.locationsById.put(id, new Tuple<>(name, loc));
+    return id;
   }
 
-  public HashMap<UUID, Tuple<String, ExLocation>> getLocationsById() {
+  public HashMap<Integer, Tuple<String, ExLocation>> getLocationsById() {
     return locationsById;
   }
 
-  public void setTrackedLocation(User user, String name, ExLocation location) {
+  public void setTrackedLocation(User user, Integer id, String name, ExLocation location) {
     if (this.trackedLocationByUser.containsKey(user)) {
       this.trackedLocationByUser.get(user).getB().cancel();
     }
 
     Sideboard sideboard = EndGameServer.getScoreboardManager()
         .registerSideboard(new SideboardBuilder()
-            .name("endgameloc")
+            .name("endgame_" + id)
             .title("§6§lLocation")
             .setScore(6, "§cName: §f" + name)
             .setScore(5, "-------------------")

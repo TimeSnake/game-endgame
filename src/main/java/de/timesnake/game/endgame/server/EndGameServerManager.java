@@ -328,9 +328,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
       if (user.getExWorld().equals(this.gameWorldNether)) {
         Location loc = user.getLocation();
 
-        UUID uuid = UUID.randomUUID();
-        EndGameServer.getLocShowManager()
-            .addLocation(uuid, "nether portal", ExLocation.fromLocation(loc));
+        int id = EndGameServer.getLocShowManager().addLocation("nether portal", ExLocation.fromLocation(loc));
 
         this.netherPortalLocated = true;
 
@@ -341,7 +339,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
                     " " + loc.getBlockX() + " " + loc.getBlockY()
                         + " " + loc.getBlockZ(), ExTextColor.VALUE))
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
-                    "/locshow " + uuid))
+                    "/locshow " + id))
                 .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT,
                     Component.text(
                         "Click to save location in sideboard"))));
