@@ -17,11 +17,6 @@ public class EndGameServer extends GameServer {
     server.resetGame();
   }
 
-  @Deprecated
-  public static void broadcastGameMessage(String message) {
-    server.broadcastGameMessage(message);
-  }
-
   public static void pauseGame() {
     server.pauseGame();
   }
