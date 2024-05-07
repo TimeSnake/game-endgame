@@ -229,11 +229,6 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     Server.broadcastMessage(Plugin.END_GAME, message);
   }
 
-  @Deprecated
-  public void broadcastGameMessage(String message) {
-    Server.broadcastMessage(Plugin.END_GAME, Component.text(message, ExTextColor.PUBLIC));
-  }
-
   public void pauseGame() {
     this.broadcastGameMessage(Component.text("Game paused", ExTextColor.PUBLIC));
     Server.getUsers().forEach(user -> ((EndGameUser) user).pause());
