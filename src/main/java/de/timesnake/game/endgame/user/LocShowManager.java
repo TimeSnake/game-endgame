@@ -41,7 +41,7 @@ public class LocShowManager {
 
     Sideboard sideboard = EndGameServer.getScoreboardManager()
         .registerSideboard(new SideboardBuilder()
-            .name("endgame_" + id)
+            .name("endgame_" + id + user.getName())
             .title("§6§lLocation")
             .setScore(6, "§cName: §f" + name)
             .setScore(5, "-------------------")
