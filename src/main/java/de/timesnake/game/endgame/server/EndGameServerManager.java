@@ -141,7 +141,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
       }
 
       @Override
-      public boolean loadTools() {
+      public boolean loadSpectatorTools() {
         return true;
       }
     };
