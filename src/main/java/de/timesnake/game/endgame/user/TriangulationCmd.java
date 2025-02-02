@@ -11,11 +11,11 @@ import de.timesnake.basic.bukkit.util.chat.cmd.Completion;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
 import de.timesnake.basic.bukkit.util.user.User;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
-import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.chat.Chat;
 import de.timesnake.library.chat.Code;
 import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.chat.Plugin;
 import de.timesnake.library.commands.PluginCommand;
 import de.timesnake.library.commands.simple.Arguments;
 import net.kyori.adventure.text.Component;
@@ -28,9 +28,9 @@ public class TriangulationCmd implements CommandListener {
   private Location firstLocation;
   private Location secondLocation;
 
-  private final Code perm = Plugin.END_GAME.createPermssionCode("game.endgame.triangulator");
-  private final Code invalidIndex = Plugin.END_GAME.createHelpCode("Invalid location index, must be 1 or 2");
-  private final Code tooFewLocations = Plugin.END_GAME.createHelpCode("Too few locations");
+  private final Code perm = Plugin.GAME.createPermssionCode("game.endgame.triangulator");
+  private final Code invalidIndex = Plugin.GAME.createHelpCode("Invalid location index, must be 1 or 2");
+  private final Code tooFewLocations = Plugin.GAME.createHelpCode("Too few locations");
 
   @Override
   public void onCommand(Sender sender, PluginCommand cmd, Arguments<Argument> args) {
@@ -85,7 +85,7 @@ public class TriangulationCmd implements CommandListener {
       int id = EndGameServer.getLocShowManager().addLocation("stronghold", ExLocation.fromLocation(stronghold));
 
       Server.broadcastMessage(
-          Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
+          Chat.getSenderPlugin(Plugin.GAME)
               .append(Component.text("stronghold", ExTextColor.PUBLIC))
               .append(Component.text(
                   " " + stronghold.getBlockX() + " " + stronghold.getBlockY()

@@ -10,10 +10,10 @@ import de.timesnake.basic.bukkit.util.chat.cmd.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.cmd.Completion;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
 import de.timesnake.basic.bukkit.util.world.ExLocation;
-import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.library.chat.Code;
 import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.chat.Plugin;
 import de.timesnake.library.commands.PluginCommand;
 import de.timesnake.library.commands.simple.Arguments;
 import net.kyori.adventure.text.Component;
@@ -24,7 +24,7 @@ import org.bukkit.Note;
 
 public class LocCmd implements CommandListener {
 
-  private final Code perm = Plugin.END_GAME.createPermssionCode("endgame.location");
+  private final Code perm = Plugin.GAME.createPermssionCode("endgame.location");
 
   @Override
   public void onCommand(Sender sender, PluginCommand cmd, Arguments<Argument> args) {
