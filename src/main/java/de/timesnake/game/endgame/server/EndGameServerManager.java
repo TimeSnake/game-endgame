@@ -18,7 +18,6 @@ import de.timesnake.basic.game.util.server.GameServerManager;
 import de.timesnake.basic.game.util.user.SpectatorManager;
 import de.timesnake.channel.util.message.ChannelServerMessage;
 import de.timesnake.channel.util.message.MessageType;
-import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.main.GameEndGame;
 import de.timesnake.game.endgame.user.EndGameUser;
 import de.timesnake.game.endgame.user.LocShowManager;
@@ -26,6 +25,7 @@ import de.timesnake.game.endgame.user.TablistManager;
 import de.timesnake.library.basic.util.Status;
 import de.timesnake.library.chat.Chat;
 import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.chat.Plugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -150,10 +150,10 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
   @EventHandler
   public void onUserJoin(UserJoinEvent e) {
     EndGameUser user = (EndGameUser) e.getUser();
-    user.sendPluginMessage(Plugin.END_GAME,
+    user.sendPluginMessage(Plugin.GAME,
         Component.text("If you or one of your friends die, the whole " +
             "world will be set back!", ExTextColor.WARNING, TextDecoration.BOLD));
-    user.sendPluginMessage(Plugin.END_GAME, Component.text("To play normal survival-build, " +
+    user.sendPluginMessage(Plugin.GAME, Component.text("To play normal survival-build, " +
         "please use the survival-server", ExTextColor.PUBLIC));
 
     if (!this.started || this.playingUsers.contains(user.getUniqueId())) {
@@ -187,7 +187,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
     }
 
     this.locShowManager.reset();
-    Server.broadcastMessage(Plugin.END_GAME,
+    Server.broadcastMessage(Plugin.GAME,
         Component.text("Starting world reset", ExTextColor.WARNING));
     for (User user : Server.getUsers()) {
       user.resetSideboard();
@@ -226,7 +226,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
   }
 
   public void broadcastGameMessage(Component message) {
-    Server.broadcastMessage(Plugin.END_GAME, message);
+    Server.broadcastMessage(Plugin.GAME, message);
   }
 
   public void pauseGame() {
@@ -286,7 +286,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
       this.ended = true;
       for (User u : Server.getUsers()) {
         u.setGameMode(GameMode.SPECTATOR);
-        u.asSender(Plugin.END_GAME)
+        u.asSender(Plugin.GAME)
             .sendMessageCommandHelp(Component.text("Reset", ExTextColor.PERSONAL),
                 Component.text("eg reset", ExTextColor.VALUE));
       }
@@ -328,7 +328,7 @@ public class EndGameServerManager extends GameServerManager<NonTmpGame> implemen
         this.netherPortalLocated = true;
 
         Server.broadcastMessage(
-            Chat.getSenderPlugin(de.timesnake.game.endgame.chat.Plugin.END_GAME)
+            Chat.getSenderPlugin(Plugin.GAME)
                 .append(Component.text("nether portal", ExTextColor.PUBLIC))
                 .append(Component.text(
                     " " + loc.getBlockX() + " " + loc.getBlockY()

@@ -8,23 +8,23 @@ import de.timesnake.basic.bukkit.util.chat.cmd.Argument;
 import de.timesnake.basic.bukkit.util.chat.cmd.CommandListener;
 import de.timesnake.basic.bukkit.util.chat.cmd.Completion;
 import de.timesnake.basic.bukkit.util.chat.cmd.Sender;
-import de.timesnake.game.endgame.chat.Plugin;
 import de.timesnake.game.endgame.server.EndGameMode;
 import de.timesnake.game.endgame.server.EndGameServer;
 import de.timesnake.game.endgame.server.EndGameServerManager;
 import de.timesnake.library.chat.Code;
 import de.timesnake.library.chat.ExTextColor;
+import de.timesnake.library.chat.Plugin;
 import de.timesnake.library.commands.PluginCommand;
 import de.timesnake.library.commands.simple.Arguments;
 import net.kyori.adventure.text.Component;
 
 public class EndGameCmd implements CommandListener {
 
-  private final Code perm = Plugin.END_GAME.createPermssionCode("endgame");
-  private final Code resumePerm = Plugin.END_GAME.createPermssionCode("endgame.resume");
-  private final Code pausePerm = Plugin.END_GAME.createPermssionCode("endgame.pause");
-  private final Code resetPerm = Plugin.END_GAME.createPermssionCode("endgame.reset");
-  private final Code modePerm = Plugin.END_GAME.createPermssionCode("endgame.mode");
+  private final Code perm = Plugin.GAME.createPermssionCode("endgame");
+  private final Code resumePerm = Plugin.GAME.createPermssionCode("endgame.resume");
+  private final Code pausePerm = Plugin.GAME.createPermssionCode("endgame.pause");
+  private final Code resetPerm = Plugin.GAME.createPermssionCode("endgame.reset");
+  private final Code modePerm = Plugin.GAME.createPermssionCode("endgame.mode");
 
   @Override
   public void onCommand(Sender sender, PluginCommand cmd,
