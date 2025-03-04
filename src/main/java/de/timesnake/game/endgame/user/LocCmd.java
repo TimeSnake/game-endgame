@@ -53,7 +53,7 @@ public class LocCmd implements CommandListener {
   @Override
   public Completion getTabCompletion() {
     return new Completion(this.perm)
-        .addArgument(new Completion("lava", "cave", "village", "portal", "hier"));
+        .addArgument(new Completion("lava", "cave", "village", "portal", "hier").allowAny());
   }
 
   @Override

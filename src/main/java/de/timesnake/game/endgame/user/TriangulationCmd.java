@@ -144,7 +144,7 @@ public class TriangulationCmd implements CommandListener {
   @Override
   public Completion getTabCompletion() {
     return new Completion(this.perm)
-        .addArgument(new Completion("1", "2", "calc", "calculate"));
+        .addArgument(new Completion("1", "2", "calc", "calculate").allowAny());
   }
 
   @Override
