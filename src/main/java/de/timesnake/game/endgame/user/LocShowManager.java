@@ -39,23 +39,29 @@ public class LocShowManager {
       this.trackedLocationByUser.get(user).getB().cancel();
     }
 
-    Sideboard sideboard = EndGameServer.getScoreboardManager()
-        .registerSideboard(new SideboardBuilder()
-            .name("endgame_" + id + user.getName())
-            .title("§6§lLocation")
-            .setScore(6, "§cName: §f" + name)
-            .setScore(5, "-------------------")
-            .setScore(4, "§9X: §f" + location.getBlockX())
-            .setScore(3, "§9Y: §f" + location.getBlockY())
-            .setScore(2, "§9Z: §f" + location.getBlockZ()));
+    Sideboard sideboard = EndGameServer.getScoreboardManager().getSideboard("endgame_" + id + user.getName());
+
+    if (sideboard == null) {
+      sideboard = EndGameServer.getScoreboardManager()
+          .registerSideboard(new SideboardBuilder()
+              .name("endgame_" + id + user.getName())
+              .title("§6§lLocation")
+              .setScore(6, "§cName: §f" + name)
+              .setScore(5, "-------------------")
+              .setScore(4, "§9X: §f" + location.getBlockX())
+              .setScore(3, "§9Y: §f" + location.getBlockY())
+              .setScore(2, "§9Z: §f" + location.getBlockZ()));
+    }
+
     user.setSideboard(sideboard);
 
+    Sideboard finalSideboard = sideboard;
     BukkitTask task = Server.runTaskTimerSynchrony(() -> {
       Location userLoc = user.getLocation();
 
       if (!userLoc.getWorld().equals(location.getWorld())) {
-        sideboard.setScore(1, "§6§l  other world");
-        sideboard.setScore(0, "§6    ");
+        finalSideboard.setScore(1, "§6§l  other world");
+        finalSideboard.setScore(0, "§6    ");
         return;
       }
 
@@ -98,8 +104,8 @@ public class LocShowManager {
 
       int heightDelta = location.getBlockY() - userLoc.getBlockY();
 
-      sideboard.setScore(1, "§6§l     " + direction + "    ↕ §6" + heightDelta + "m");
-      sideboard.setScore(0, "§6     " + ((int) userLoc.distance(location)));
+      finalSideboard.setScore(1, "§6§l     " + direction + "    ↕ §6" + heightDelta + "m");
+      finalSideboard.setScore(0, "§6     " + ((int) userLoc.distance(location)));
     }, 0, 20, GameEndGame.getPlugin());
 
     this.trackedLocationByUser.put(user, new Tuple<>(location, task));
